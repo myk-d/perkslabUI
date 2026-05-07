@@ -55,11 +55,13 @@
 		"classnames": "^2.5.1",
 		"clsx": "^2.1.1",
 		"dayjs": "^1.11.20",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0",
 		"tailwind-merge": "^2.6.1",
 		"tailwindcss": "^3.4.1",
 		"tailwindcss-animate": "^1.0.7"
+	},
+	"peerDependencies": {
+		"react": ">=16.8.0",
+		"react-dom": ">=16.8.0"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.23.4",
