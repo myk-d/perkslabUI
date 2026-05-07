@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { cn } from 'src/utils';
+import { cn } from '../utils';
 
 type ButtonVariant = 'default' | 'outline' | 'ghost' | 'danger' | 'link' | 'disabled' | 'success' | 'warning' | 'info';
 type ButtonSize = 'sm' | 'md' | 'lg' | 'full';

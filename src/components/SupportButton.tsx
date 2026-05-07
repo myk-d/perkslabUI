@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { cn } from 'src/utils';
+import { cn } from '../utils';
 
 interface SupportButtonProps {
 	supportEmail?: string;
