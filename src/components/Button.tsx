@@ -1,68 +1,61 @@
-import React from 'react';
-import { cn } from '../utils';
-import './styles.css';
+import React, { forwardRef } from 'react';
+import { cn } from 'src/utils';
 
-interface BadgeProps extends React.HTMLAttributes<HTMLButtonElement> {
-	variant?:
-		| 'none'
-		| 'standard'
-		| 'neutral'
-		| 'ghost'
-		| 'primary'
-		| 'primary-outline'
-		| 'secondary'
-		| 'secondary-outline'
-		| 'accent'
-		| 'accent-outline'
-		| 'info'
-		| 'info-outline'
-		| 'warning'
-		| 'warning-outline'
-		| 'success'
-		| 'success-outline'
-		| 'error'
-		| 'error-outline';
+type ButtonVariant = 'default' | 'outline' | 'ghost' | 'danger' | 'link' | 'disabled' | 'success' | 'warning' | 'info';
+type ButtonSize = 'sm' | 'md' | 'lg' | 'full';
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+	variant?: ButtonVariant;
+	size?: ButtonSize;
+	isLoading?: boolean;
 }
 
-const Button: React.FC<BadgeProps> = ({ className, children, variant, ...props }) => {
-	const variants: { [key: string]: string } = {
-		none: 'bg-white border-2 px-8 py-2 w-fit border-zinc-950',
-		standard: 'border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium bg-gray-200 hover:bg-gray-400',
-		neutral: 'bg-neutral-600 text-gray-50 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-neutral-700',
-		ghost: 'bg-transparent w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-gray-300',
-		//
-		primary: 'bg-teal-200 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-teal-300',
-		'primary-outline': 'border-2 border-teal-200 w-fit px-8 py-2 hover:font-medium hover:bg-gray-100',
-		//
-		secondary: 'bg-purple-100 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-purple-200',
-		'secondary-outline': 'border-2 border-purple-200 w-fit px-8 py-2 hover:font-medium hover:bg-gray-100',
-		//
-		accent: 'bg-orange-200 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-orange-300',
-		'accent-outline': 'border-2 border-orange-200 w-fit px-8 py-2 hover:font-medium hover:bg-gray-100',
-		//
-		info: 'bg-blue-200 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-blue-300',
-		'info-outline': 'bg-transparent border-2 w-fit px-8 py-2 border-blue-300 hover:font-medium hover:bg-gray-100',
-		//
-		warning: 'bg-yellow-200 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-yellow-300',
-		'warning-outline': 'bg-transparent border-2 w-fit px-8 py-2 border-yellow-300 hover:font-medium hover:bg-gray-100',
-		//
-		success: 'bg-lime-300 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-green-600',
-		'success-outline': 'bg-transparent border-2 w-fit px-8 py-2 border-green-600 hover:font-medium hover:bg-gray-100',
-		//
-		error: 'bg-red-400 border-2 w-fit px-8 py-2 border-zinc-950 hover:font-medium hover:bg-red-500',
-		'error-outline': 'bg-transparent border-2 w-fit px-8 py-2 border-red-500 hover:font-medium hover:bg-gray-100',
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant = 'default', size = 'md', isLoading, children, ...props }, ref) => {
+	const baseStyles =
+		'cursor-pointer inline-flex items-center justify-center font-bold transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2';
+
+	const variants: Record<ButtonVariant, string> = {
+		default: 'bg-brand text-page-bg hover:bg-brand-hover shadow-sm rounded-xl',
+		outline: 'bg-transparent border border-brand text-brand hover:bg-brand-bg rounded-xl',
+		ghost: 'bg-transparent text-brand hover:bg-brand-bg rounded-xl',
+		link: 'bg-transparent text-brand underline-offset-4 hover:underline p-0',
+
+		danger: 'bg-red-600 text-white hover:bg-red-700 rounded-xl',
+		success: 'bg-green-600 text-white hover:bg-green-700 rounded-xl',
+		warning: 'bg-yellow-600 text-white hover:bg-yellow-700 rounded-xl',
+
+		info: 'bg-brand text-page-bg hover:opacity-90 rounded-xl',
+		disabled: 'bg-gray-400 text-white cursor-not-allowed',
 	};
+
+	const sizes: Record<ButtonSize, string> = {
+		sm: 'px-4 py-2 text-sm',
+		md: 'px-6 py-3 text-base',
+		lg: 'px-8 py-4 text-lg',
+		full: 'w-full py-3.5 text-base',
+	};
+
 	return (
-		<button
-			className={cn(
-				'rounded-lg transition-all duration-300',
-				variants[variant ? (variants.hasOwnProperty(variant) ? variant : 'none') : 'none'],
-				className
+		<button ref={ref} className={cn(baseStyles, variants[variant], sizes[size], className)} disabled={isLoading} {...props}>
+			{isLoading ? (
+				<span className="flex items-center gap-2">
+					<svg className="animate-spin h-5 w-5 text-current" fill="none" viewBox="0 0 24 24">
+						<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+						<path
+							className="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+						></path>
+					</svg>
+					...
+				</span>
+			) : (
+				children
 			)}
-			{...props}>
-			{children || 'button'}
 		</button>
 	);
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;

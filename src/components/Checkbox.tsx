@@ -1,0 +1,39 @@
+import React, { forwardRef } from 'react';
+import { cn } from 'src/utils';
+
+interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+	label?: string;
+}
+
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({ className, label, ...props }, ref) => {
+	return (
+		<label className="flex items-center gap-3 cursor-pointer group">
+			<div className="relative flex items-center justify-center">
+				<input
+					type="checkbox"
+					ref={ref}
+					className={cn(
+						'peer appearance-none',
+						'w-5 h-5 border border-brand rounded-lg bg-page-bg',
+						'checked:bg-brand transition-all duration-300',
+						'group-hover:bg-brand-bg peer-checked:group-hover:bg-brand',
+						className,
+					)}
+					{...props}
+				/>
+				<svg
+					className="absolute w-4 h-4 text-page-bg uppercase pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity duration-200"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					strokeWidth="3.5"
+				>
+					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+				</svg>
+			</div>
+			{label && <span className="text-sm font-bold uppercase tracking-wider text-page-text transition-colors duration-300">{label}</span>}
+		</label>
+	);
+});
+
+Checkbox.displayName = 'Checkbox';
