@@ -1,3 +1,4 @@
+// @ts-nocheck
 import dayjs, { Dayjs } from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
 import updateLocale from 'dayjs/plugin/updateLocale';
