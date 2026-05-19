@@ -12,6 +12,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"allowJs": true
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"include": ["src", "src/types.d.ts"],
 	"exclude": ["dist"]
 }

@@ -5,7 +5,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	className?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
+export const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const isPassword = type === 'password';
 
@@ -59,5 +59,3 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, ...pr
 });
 
 Input.displayName = 'Input';
-
-export default Input;

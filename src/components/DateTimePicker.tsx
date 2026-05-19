@@ -124,7 +124,7 @@ export const DateTimePicker = React.forwardRef<HTMLDivElement, Props>(({ value, 
 									onClick={() => onChange(value.date(date.date()).month(date.month()).year(date.year()))}
 									className={`
                     h-9 w-9 text-sm rounded-lg flex items-center justify-center transition-all duration-200
-                    ${!isCurrentMonth ? 'text-page-text/20' : 'text-page-text font-medium'}
+                    ${!isCurrentMonth ? 'text-page-text/20' : 'font-medium'}
                     ${isSelected ? 'bg-brand text-page-bg' : 'hover:bg-brand-bg'}
                   `}
 								>
