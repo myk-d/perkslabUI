@@ -2,17 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../utils';
 import { Theme, useAppTheme } from './ThemeContext';
 
-interface ThemeGroupOption {
-	id: string;
-	name: string;
-}
-
-interface ThemeGroup {
-	label: string;
-	options: ThemeGroupOption[];
-}
-
-const themeGroups: ThemeGroup[] = [
+const themeGroups = [
 	{
 		label: 'Classic',
 		options: [
@@ -71,8 +61,7 @@ export const ThemeSwitcher = () => {
 	}, []);
 
 	const currentThemeName =
-		themeGroups.reduce<(typeof themeGroups)[0]['options']>((acc, g) => [...acc, ...g.options], []).find((o) => o.id === theme)?.name ||
-		'purple-light';
+		themeGroups.reduce<(typeof themeGroups)[0]['options']>((acc, g) => [...acc, ...g.options], []).find((o) => o.id === theme)?.name || 'Theme';
 
 	return (
 		<div className="relative inline-block text-left" ref={dropdownRef}>
