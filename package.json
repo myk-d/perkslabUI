@@ -24,7 +24,8 @@
 			"require": "./dist/index.js",
 			"types": "./dist/index.d.ts"
 		},
-		"./components/*": "./dist/components/*"
+		"./components/*": "./dist/components/*",
+		"./styles.css": "./dist/components/styles.css"
 	},
 	"scripts": {
 		"build:ts": "tsc -p tsconfig.build.json",
