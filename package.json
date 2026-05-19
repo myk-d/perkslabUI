@@ -25,11 +25,7 @@
 			"require": "./dist/index.js"
 		},
 		"./components/*": "./dist/components/*",
-		"./styles.css": {
-			"import": "./dist/components/styles.css",
-			"require": "./dist/components/styles.css",
-			"default": "./dist/components/styles.css"
-		}
+		"./tailwind.config": "./tailwind.config.js"
 	},
 	"scripts": {
 		"build:ts": "tsc -p tsconfig.build.json",
