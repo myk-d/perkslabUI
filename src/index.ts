@@ -19,6 +19,7 @@ import { Sheet, SheetActionButton, SheetCloseButton, SheetContent, SheetTrigger 
 import { SupportButton } from './components/SupportButton';
 import { Theme, themeHexColors, ThemeProvider, useAppTheme } from './components/Theme/ThemeContext';
 import { ThemeSwitcher } from './components/Theme/ThemeSwitcher';
+import { ToastProvider } from './components/Toasts/ToastContext';
 import { ToastService } from './helpers/services/ToastService';
 
 export {
@@ -53,6 +54,7 @@ export {
 	themeHexColors,
 	ThemeProvider,
 	ThemeSwitcher,
+	ToastProvider,
 	ToastService,
 	useAppTheme,
 };
