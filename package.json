@@ -20,12 +20,16 @@
 	},
 	"exports": {
 		".": {
+			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",
-			"require": "./dist/index.js",
-			"types": "./dist/index.d.ts"
+			"require": "./dist/index.js"
 		},
 		"./components/*": "./dist/components/*",
-		"./styles.css": "./dist/components/styles.css"
+		"./styles.css": {
+			"import": "./dist/components/styles.css",
+			"require": "./dist/components/styles.css",
+			"default": "./dist/components/styles.css"
+		}
 	},
 	"scripts": {
 		"build:ts": "tsc -p tsconfig.build.json",
