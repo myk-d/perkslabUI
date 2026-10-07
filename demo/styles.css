@@ -1,0 +1,7 @@
+@import 'tailwindcss';
+@import 'perkslab-ui/styles.css';
+
+body {
+	font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+	@apply transition-colors duration-300;
+}

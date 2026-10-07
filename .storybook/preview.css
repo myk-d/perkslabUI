@@ -1,0 +1,7 @@
+@import 'tailwindcss';
+@import 'perkslab-ui/styles.css';
+@source "../stories";
+
+body {
+	font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
