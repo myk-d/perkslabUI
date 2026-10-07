@@ -1,104 +1,55 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { cn } from '../utils';
+import React from 'react';
+import { cn } from '../lib/cn';
+import { Dialog, DialogAction, DialogClose, DialogDescription, DialogSurfacePrimitive, DialogTitle, DialogTrigger } from './Dialog';
 
-interface SheetContextProps {
-	isOpen: boolean;
-	toggle: () => void;
-}
+/** Side panel: `<Sheet><SheetTrigger/><SheetContent side="right">…</SheetContent></Sheet>`. Same open/onOpenChange contract as Dialog. */
+export const Sheet = Dialog;
+export const SheetTrigger = DialogTrigger;
+export const SheetClose = DialogClose;
+export const SheetTitle = DialogTitle;
+export const SheetDescription = DialogDescription;
+/** Runs `onClick`, then closes. */
+export const SheetActionButton = DialogAction;
+export const SheetCloseButton = DialogClose;
 
-const SheetContext = createContext<SheetContextProps | undefined>(undefined);
+type Side = 'left' | 'right' | 'top' | 'bottom';
 
-export const Sheet = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-	const [isOpen, setIsOpen] = useState(false);
-
-	const toggle = () => setIsOpen((prev) => !prev);
-
-	useEffect(() => {
-		if (isOpen) {
-			document.body.style.overflow = 'hidden';
-		} else {
-			document.body.style.overflow = 'unset';
-		}
-		return () => {
-			document.body.style.overflow = 'unset';
-		};
-	}, [isOpen]);
-
-	return (
-		<SheetContext.Provider value={{ isOpen, toggle }}>
-			<div className={cn('', className)}>{children}</div>
-		</SheetContext.Provider>
-	);
+const sideClasses: Record<Side, { wrapper: string; panel: string }> = {
+	right: { wrapper: 'flex', panel: 'ml-auto h-full w-3/4 sm:max-w-sm border-l animate-pk-slide-in-right' },
+	left: { wrapper: 'flex', panel: 'mr-auto h-full w-3/4 sm:max-w-sm border-r animate-pk-slide-in-left' },
+	top: { wrapper: 'flex flex-col', panel: 'mb-auto h-auto w-full max-h-full border-b animate-pk-slide-in-top' },
+	bottom: { wrapper: 'flex flex-col', panel: 'mt-auto h-auto w-full max-h-full border-t animate-pk-slide-in-bottom' },
 };
 
-export const SheetTrigger = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-	const context = useContext(SheetContext);
-	if (!context) throw new Error('SheetTrigger must be used within Sheet');
-
-	return (
-		<div className={cn('w-fit cursor-pointer', className)} onClick={context.toggle}>
-			{children}
-		</div>
-	);
-};
-
-export const SheetContent = ({
-	children,
-	className,
-	position = 'right',
-}: {
+export interface SheetContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role'> {
 	children: React.ReactNode;
 	className?: string;
+	side?: Side;
+	/** @deprecated use `side`. */
 	position?: 'left' | 'right';
-}) => {
-	const context = useContext(SheetContext);
-	if (!context) throw new Error('SheetContent must be used within Sheet');
+	/** Renders the X button in the corner. Default true (shadcn). */
+	showCloseButton?: boolean;
+	closeOnBackdrop?: boolean;
+	closeLabel?: string;
+}
 
-	if (!context.isOpen) return null;
-
+export const SheetContent = ({ children, className, side, position, showCloseButton = true, closeOnBackdrop = true, closeLabel, ...panelProps }: SheetContentProps) => {
+	const resolved = side ?? position ?? 'right';
+	const s = sideClasses[resolved];
 	return (
-		<div className="fixed inset-0 z-[100] flex">
-			{/* Backdrop */}
-			<div className="absolute inset-0 bg-page-text/20 backdrop-blur-sm animate-in fade-in duration-300" onClick={context.toggle} />
-
-			{/* Sheet Panel */}
-			<div
-				className={cn(
-					'relative h-full w-80 bg-page-bg shadow-2xl p-6 flex flex-col gap-6',
-					'animate-in duration-300 ease-in-out',
-					position === 'right' ? 'ml-auto border-l border-brand slide-in-from-right' : 'mr-auto border-r border-brand slide-in-from-left',
-					className,
-				)}
-			>
-				{children}
-			</div>
-		</div>
-	);
-};
-
-export const SheetCloseButton = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-	const context = useContext(SheetContext);
-	if (!context) throw new Error('SheetCloseButton must be used within Sheet');
-
-	return (
-		<div className={cn('cursor-pointer', className)} onClick={context.toggle}>
+		<DialogSurfacePrimitive
+			part="SheetContent"
+			wrapperClassName={cn('fixed inset-0 z-[100]', s.wrapper)}
+			panelClassName={cn('relative overflow-y-auto bg-surface text-page-text shadow-pop p-6 flex flex-col gap-6 border-line outline-none', s.panel, className)}
+			showCloseButton={showCloseButton}
+			closeOnBackdrop={closeOnBackdrop}
+			closeLabel={closeLabel}
+			panelProps={{ ...panelProps, ...({ 'data-side': resolved } as object) }}
+		>
 			{children}
-		</div>
+		</DialogSurfacePrimitive>
 	);
 };
 
-export const SheetActionButton = ({ children, onClick, className }: { children: React.ReactNode; onClick?: () => void; className?: string }) => {
-	const context = useContext(SheetContext);
-	if (!context) throw new Error('SheetActionButton must be used within Sheet');
-
-	const handleClick = () => {
-		if (onClick) onClick();
-		context.toggle();
-	};
-
-	return (
-		<div className={cn('cursor-pointer', className)} onClick={handleClick}>
-			{children}
-		</div>
-	);
-};
+export const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div data-slot="sheet-header" className={cn('flex flex-col gap-1.5 pe-8', className)} {...props} />;
+export const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div data-slot="sheet-footer" className={cn('mt-auto flex flex-col gap-2', className)} {...props} />;

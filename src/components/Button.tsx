@@ -1,60 +1,79 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../utils';
+import { cn } from '../lib/cn';
+import { SpinnerIcon } from '../lib/icons';
+import { Slot } from '../lib/Slot';
 
-type ButtonVariant = 'default' | 'outline' | 'ghost' | 'danger' | 'link' | 'disabled' | 'success' | 'warning' | 'info';
-type ButtonSize = 'sm' | 'md' | 'lg' | 'full';
+export type ButtonVariant = 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'destructive' | 'success' | 'warning' | 'info' | 'disabled';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'default' | 'lg' | 'full' | 'icon' | 'icon-xs' | 'icon-sm' | 'icon-lg';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+const base =
+	'cursor-pointer inline-flex items-center justify-center gap-2 font-bold whitespace-nowrap select-none transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-page-bg [&_svg]:shrink-0 [&_svg:not([class*=size-])]:size-4 [&_[data-icon=inline-start]]:-ms-1 [&_[data-icon=inline-end]]:-me-1';
+
+const variants: Record<ButtonVariant, string> = {
+	default: 'bg-brand text-brand-fg hover:bg-brand-hover shadow-box rounded-control',
+	secondary: 'bg-brand-bg text-page-text hover:bg-brand-bg/70 rounded-control',
+	outline: 'ui-border bg-transparent text-action hover:bg-hover rounded-control',
+	ghost: 'bg-transparent text-action hover:bg-hover rounded-control',
+	link: 'bg-transparent text-action underline-offset-4 hover:underline p-0! rounded-item',
+
+	danger: 'bg-danger text-page-bg hover:bg-danger/85 rounded-control',
+	/** shadcn's name for `danger`. */
+	destructive: 'bg-danger text-page-bg hover:bg-danger/85 rounded-control',
+	success: 'bg-ok text-page-bg hover:bg-ok/85 rounded-control',
+	warning: 'bg-warning text-page-bg hover:bg-warning/85 rounded-control',
+	info: 'bg-info text-page-bg hover:bg-info/85 rounded-control',
+
+	/** @deprecated use the `disabled` prop. Kept so existing code keeps its look. */
+	disabled: 'bg-muted/40 text-page-bg cursor-not-allowed rounded-control',
+};
+
+const sizes: Record<ButtonSize, string> = {
+	xs: 'px-2.5 py-1 text-xs',
+	sm: 'px-4 py-2 text-sm',
+	md: 'px-(--ui-btn-px) py-(--ui-btn-py) text-(length:--ui-btn-text)',
+	/** shadcn's name for `md`. */
+	default: 'px-(--ui-btn-px) py-(--ui-btn-py) text-(length:--ui-btn-text)',
+	lg: 'px-8 py-4 text-lg',
+	full: 'w-full py-3.5 text-base',
+	icon: 'size-10 p-0',
+	'icon-xs': 'size-6 p-0',
+	'icon-sm': 'size-8 p-0',
+	'icon-lg': 'size-12 p-0',
+};
+
+/** Class names of a Button — use it to style an `<a>` / router `<Link>` as a button (or use `<Button asChild>`). */
+export function buttonVariants({ variant = 'default', size = 'md', className }: { variant?: ButtonVariant; size?: ButtonSize; className?: string } = {}) {
+	return cn(base, variants[variant], sizes[size], className);
+}
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 	isLoading?: boolean;
+	/** Render the single child (e.g. `<Link>`) with the button styles instead of a `<button>`. */
+	asChild?: boolean;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant = 'default', size = 'md', isLoading, children, ...props }, ref) => {
-	const baseStyles =
-		'cursor-pointer inline-flex items-center justify-center font-bold transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2';
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+	({ className, variant = 'default', size = 'md', isLoading, disabled, asChild, children, ...props }, ref) => {
+		const classes = buttonVariants({ variant, size, className });
 
-	const variants: Record<ButtonVariant, string> = {
-		default: 'bg-brand text-page-bg hover:bg-brand-hover shadow-sm rounded-xl',
-		outline: 'bg-transparent border border-brand text-brand hover:bg-brand-bg rounded-xl',
-		ghost: 'bg-transparent text-brand hover:bg-brand-bg rounded-xl',
-		link: 'bg-transparent text-brand underline-offset-4 hover:underline p-0',
+		if (asChild) {
+			return (
+				<Slot className={classes} aria-busy={isLoading || undefined} {...props}>
+					{children}
+				</Slot>
+			);
+		}
 
-		danger: 'bg-red-600 text-white hover:bg-red-700 rounded-xl',
-		success: 'bg-green-600 text-white hover:bg-green-700 rounded-xl',
-		warning: 'bg-yellow-600 text-white hover:bg-yellow-700 rounded-xl',
-
-		info: 'bg-brand text-page-bg hover:opacity-90 rounded-xl',
-		disabled: 'bg-gray-400 text-white cursor-not-allowed',
-	};
-
-	const sizes: Record<ButtonSize, string> = {
-		sm: 'px-4 py-2 text-sm',
-		md: 'px-6 py-3 text-base',
-		lg: 'px-8 py-4 text-lg',
-		full: 'w-full py-3.5 text-base',
-	};
-
-	return (
-		<button ref={ref} className={cn(baseStyles, variants[variant], sizes[size], className)} disabled={isLoading} {...props}>
-			{isLoading ? (
-				<span className="flex items-center gap-2">
-					<svg className="animate-spin h-5 w-5 text-current" fill="none" viewBox="0 0 24 24">
-						<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-						<path
-							className="opacity-75"
-							fill="currentColor"
-							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-						></path>
-					</svg>
-					...
-				</span>
-			) : (
-				children
-			)}
-		</button>
-	);
-});
+		return (
+			<button ref={ref} className={classes} disabled={disabled || isLoading} aria-busy={isLoading || undefined} {...props}>
+				{isLoading && <SpinnerIcon className="animate-spin size-5 shrink-0" />}
+				{children}
+			</button>
+		);
+	},
+);
 
 Button.displayName = 'Button';
 

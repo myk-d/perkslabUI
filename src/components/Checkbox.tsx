@@ -1,37 +1,40 @@
-import React, { forwardRef } from 'react';
-import { cn } from '../utils';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { cn } from '../lib/cn';
+import { CheckIcon, MinusIcon } from '../lib/icons';
 
-interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
-	label?: string;
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+	label?: React.ReactNode;
+	/** Shows the "some selected" dash state (visual + `indeterminate` DOM property). */
+	indeterminate?: boolean;
 }
 
-export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({ className, label, ...props }, ref) => {
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({ className, label, indeterminate, disabled, ...props }, ref) => {
+	const inputRef = useRef<HTMLInputElement>(null);
+	useImperativeHandle(ref, () => inputRef.current!);
+	useEffect(() => {
+		if (inputRef.current) inputRef.current.indeterminate = !!indeterminate;
+	}, [indeterminate]);
+
 	return (
-		<label className="flex items-center gap-3 cursor-pointer group">
-			<div className="relative flex items-center justify-center">
+		<label className={cn('inline-flex items-center gap-3 group', disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer')}>
+			<span className="relative flex items-center justify-center shrink-0">
 				<input
 					type="checkbox"
-					ref={ref}
+					ref={inputRef}
+					disabled={disabled}
 					className={cn(
-						'peer appearance-none',
-						'w-5 h-5 border border-brand rounded-lg bg-page-bg',
-						'checked:bg-brand transition-all duration-300',
-						'group-hover:bg-brand-bg peer-checked:group-hover:bg-brand',
+						'peer appearance-none cursor-[inherit] size-5 ui-border border-line rounded-item bg-control',
+						'checked:bg-brand checked:border-brand indeterminate:bg-brand indeterminate:border-brand transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-200',
+						'outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-page-bg',
+						'group-hover:bg-hover checked:group-hover:bg-brand indeterminate:group-hover:bg-brand',
 						className,
 					)}
 					{...props}
 				/>
-				<svg
-					className="absolute w-4 h-4 text-page-bg uppercase pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity duration-200"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-					strokeWidth="3.5"
-				>
-					<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-				</svg>
-			</div>
-			{label && <span className="text-sm font-bold uppercase tracking-wider text-page-text transition-colors duration-300">{label}</span>}
+				<CheckIcon className="absolute size-3.5 text-brand-fg pointer-events-none opacity-0 peer-checked:opacity-100 peer-indeterminate:opacity-0 transition-opacity duration-150" />
+				<MinusIcon className="absolute size-3.5 text-brand-fg pointer-events-none opacity-0 peer-indeterminate:opacity-100 transition-opacity duration-150" />
+			</span>
+			{label && <span className="ui-label text-sm text-page-text">{label}</span>}
 		</label>
 	);
 });

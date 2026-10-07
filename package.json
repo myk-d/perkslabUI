@@ -1,9 +1,8 @@
 {
 	"name": "perkslab-ui",
 	"description": "PerksLab UI components",
-	"version": "1.0.10",
+	"version": "2.0.0",
 	"main": "dist/index.js",
-	"typings": "dist/index.d.ts",
 	"author": "Mykola Dzoban",
 	"license": "MIT",
 	"repository": {
@@ -22,25 +21,26 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",
-			"require": "./dist/index.js"
+			"default": "./dist/index.js"
 		},
-		"./components/*": "./dist/components/*",
-		"./tailwind.config": "./tailwind.config.js"
+		"./styles.css": "./dist/styles/index.css",
+		"./themes.json": "./src/theme/themes.json",
+		"./tailwind.config": "./tailwind.config.cjs",
+		"./package.json": "./package.json"
 	},
 	"scripts": {
+		"build:css": "node scripts/build-css.mjs",
 		"build:ts": "tsc -p tsconfig.build.json",
-		"build:styles": "postcss src/components/styles.css -o dist/components/styles.css",
-		"prepublishOnly": "npm run build:ts && npm run build:styles",
-		"start": "react-scripts start",
-		"build:react": "react-scripts build",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject"
-	},
-	"babel": {
-		"presets": [
-			"@babel/preset-react",
-			"@babel/preset-typescript"
-		]
+		"build": "npm run clean && npm run build:ts && npm run build:css",
+		"typecheck": "tsc --noEmit",
+		"prepublishOnly": "npm run build",
+		"demo": "vite --config demo/vite.config.ts",
+		"demo:build": "vite build --config demo/vite.config.ts",
+		"clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build -o storybook-static",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui"
 	},
 	"keywords": [
 		"react",
@@ -55,31 +55,40 @@
 		"npm-package"
 	],
 	"dependencies": {
-		"classnames": "^2.5.1",
 		"clsx": "^2.1.1",
 		"dayjs": "^1.11.20",
-		"tailwind-merge": "^2.6.1",
-		"tailwindcss": "^4.3.0",
-		"tailwindcss-animate": "^1.0.7"
+		"tailwind-merge": "^3.7.0"
 	},
 	"peerDependencies": {
-		"react": ">=16.8.0",
-		"react-dom": ">=16.8.0"
+		"react": ">=18.0.0",
+		"react-dom": ">=18.0.0",
+		"tailwindcss": ">=4.0.0"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7.23.4",
-		"@babel/core": "^7.23.7",
-		"@babel/preset-react": "^7.23.3",
-		"@babel/preset-typescript": "^7.28.5",
-		"@tailwindcss/forms": "^0.5.7",
+		"@axe-core/playwright": "^4.13.0",
+		"@playwright/test": "1.60",
+		"@storybook/addon-docs": "^10.6.1",
+		"@storybook/react-vite": "^10.6.1",
+		"@tailwindcss/vite": "^4.3.3",
 		"@types/react": "^18.2.48",
 		"@types/react-dom": "^18.2.18",
-		"autoprefixer": "^10.4.17",
-		"postcss": "^8.4.33",
-		"postcss-cli": "^11.0.0",
+		"@vitejs/plugin-react": "^5.2.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
+		"storybook": "^10.6.1",
 		"typescript": "^5.3.3",
-		"vite": "^8.0.11"
-	}
+		"vite": "^7.3.7"
+	},
+	"type": "module",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"sideEffects": [
+		"**/*.css"
+	],
+	"files": [
+		"dist",
+		"src/theme/themes.json",
+		"tailwind.config.cjs",
+		"README.md"
+	]
 }

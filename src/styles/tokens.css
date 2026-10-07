@@ -1,0 +1,346 @@
+/*
+ * Design tokens.
+ *
+ * Two independent axes drive every component:
+ *   - data-theme  -> colours   (see colors.css)
+ *   - data-ui     -> structure (radius, borders, fonts, shadows — see ui.css)
+ *
+ * Components only ever use the utilities mapped here (bg-brand, rounded-control, border-line, ...),
+ * so switching either attribute re-skins the whole library with no re-render.
+ */
+/* `dark:` follows the active colour theme (any `dark` / `*-dark` id), not the OS setting. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme$='-dark'], [data-theme='dark'] *, [data-theme$='-dark'] *));
+
+@theme inline {
+	--color-brand: var(--brand-color);
+	--color-brand-hover: var(--brand-hover);
+	--color-brand-bg: var(--brand-bg);
+	--color-brand-fg: var(--brand-fg);
+	--color-page-bg: var(--bg-page);
+	--color-page-text: var(--text-main);
+	--color-panel: var(--bg-panel);
+	--color-panel-border: var(--panel-border);
+	--color-muted: var(--text-muted);
+	--color-danger: var(--c-danger);
+	--color-ok: var(--c-ok);
+	--color-warning: var(--c-warning);
+	--color-info: var(--c-info);
+
+	/* structure-aware colours */
+	--color-surface: var(--ui-surface);
+	--color-control: var(--ui-control-bg);
+	--color-line: var(--ui-line);
+	--color-hover: var(--ui-hover);
+	--color-action: var(--ui-action-fg);
+
+	--radius-control: var(--ui-radius-control);
+	--radius-field: var(--ui-radius-field);
+	--radius-box: var(--ui-radius-box);
+	--radius-item: var(--ui-radius-item);
+
+	--shadow-box: var(--ui-shadow-box);
+	--shadow-pop: var(--ui-shadow-pop);
+
+	--font-heading: var(--ui-font-heading);
+}
+
+@theme {
+	--animate-pk-fade-in: pk-fade-in 150ms ease-out;
+	--animate-pk-pop-in: pk-pop-in 150ms ease-out;
+	--animate-pk-slide-up: pk-slide-up 200ms ease-out;
+	--animate-pk-slide-in-right: pk-slide-in-right 220ms ease-out;
+	--animate-pk-slide-in-left: pk-slide-in-left 220ms ease-out;
+	--animate-pk-slide-in-top: pk-slide-in-top 220ms ease-out;
+	--animate-pk-slide-in-bottom: pk-slide-in-bottom 220ms ease-out;
+	--animate-pk-toast-in: pk-toast-in 250ms ease-out;
+	--animate-pk-toast-out: pk-toast-out 150ms ease-in forwards;
+	--animate-pk-collapse: pk-collapse 200ms ease-out;
+	--animate-pk-fade-out: pk-fade-out 150ms ease-in forwards;
+	--animate-pk-pop-out: pk-pop-out 150ms ease-in forwards;
+	--animate-pk-slide-down: pk-slide-down 150ms ease-in forwards;
+	--animate-pk-slide-out-right: pk-slide-out-right 180ms ease-in forwards;
+	--animate-pk-slide-out-left: pk-slide-out-left 180ms ease-in forwards;
+	--animate-pk-slide-out-top: pk-slide-out-top 180ms ease-in forwards;
+	--animate-pk-slide-out-bottom: pk-slide-out-bottom 180ms ease-in forwards;
+	--animate-pk-collapse-out: pk-collapse-out 150ms ease-in forwards;
+
+	@keyframes pk-fade-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+	@keyframes pk-pop-in {
+		from {
+			opacity: 0;
+			transform: scale(0.96) translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+	@keyframes pk-slide-up {
+		from {
+			opacity: 0;
+			transform: translateY(1rem) scale(0.97);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+	@keyframes pk-slide-in-right {
+		from {
+			transform: translateX(100%);
+		}
+		to {
+			transform: none;
+		}
+	}
+	@keyframes pk-slide-in-left {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: none;
+		}
+	}
+	@keyframes pk-slide-in-top {
+		from {
+			transform: translateY(-100%);
+		}
+		to {
+			transform: none;
+		}
+	}
+	@keyframes pk-slide-in-bottom {
+		from {
+			transform: translateY(100%);
+		}
+		to {
+			transform: none;
+		}
+	}
+	@keyframes pk-toast-in {
+		from {
+			opacity: 0;
+			transform: translateX(1rem);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+	@keyframes pk-toast-out {
+		to {
+			opacity: 0;
+			transform: translateX(1rem);
+		}
+	}
+	@keyframes pk-collapse {
+		from {
+			opacity: 0;
+			transform: translateY(-0.25rem);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+	@keyframes pk-fade-out {
+		to {
+			opacity: 0;
+		}
+	}
+	@keyframes pk-pop-out {
+		to {
+			opacity: 0;
+			transform: scale(0.96) translateY(-4px);
+		}
+	}
+	@keyframes pk-slide-down {
+		to {
+			opacity: 0;
+			transform: translateY(1rem) scale(0.97);
+		}
+	}
+	@keyframes pk-slide-out-right {
+		to {
+			transform: translateX(100%);
+		}
+	}
+	@keyframes pk-slide-out-left {
+		to {
+			transform: translateX(-100%);
+		}
+	}
+	@keyframes pk-slide-out-top {
+		to {
+			transform: translateY(-100%);
+		}
+	}
+	@keyframes pk-slide-out-bottom {
+		to {
+			transform: translateY(100%);
+		}
+	}
+	@keyframes pk-collapse-out {
+		to {
+			opacity: 0;
+			transform: translateY(-0.25rem);
+		}
+	}
+}
+
+/* ===== Reduced motion: disables every pk animation (presence uses 0ms exit in JS) ===== */
+@media (prefers-reduced-motion: reduce) {
+	[class*='animate-pk-'] {
+		animation: none !important;
+	}
+}
+/* ===== end reduced motion ===== */
+
+/* `ui-*` prefixed on purpose: tailwind-merge treats `border-*` as a colour/width group and would
+   silently drop these when combined with other border utilities. */
+@utility ui-border {
+	border-style: solid;
+	border-width: var(--ui-border-w);
+	border-color: var(--ui-line);
+}
+
+@utility ui-heading {
+	font-family: var(--ui-font-heading);
+	font-weight: var(--ui-heading-weight);
+	text-transform: var(--ui-heading-case);
+	letter-spacing: var(--ui-heading-track);
+}
+
+@utility ui-label {
+	font-weight: var(--ui-label-weight);
+	text-transform: var(--ui-label-case);
+	letter-spacing: var(--ui-label-track);
+}
+
+@utility pk-scrollbar {
+	scrollbar-width: thin;
+	scrollbar-color: var(--brand-bg) transparent;
+}
+
+/* Native range input skinned with theme tokens (Slider). `--pk-fill` is set inline to the filled percentage. */
+@utility pk-range {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 1.25rem;
+	background: transparent;
+	cursor: pointer;
+	&::-webkit-slider-runnable-track {
+		height: 0.375rem;
+		border-radius: 9999px;
+		background: linear-gradient(to right, var(--brand-color) var(--pk-fill, 0%), color-mix(in srgb, var(--text-main) 15%, transparent) var(--pk-fill, 0%));
+	}
+	&::-moz-range-track {
+		height: 0.375rem;
+		border-radius: 9999px;
+		background: color-mix(in srgb, var(--text-main) 15%, transparent);
+	}
+	&::-moz-range-progress {
+		height: 0.375rem;
+		border-radius: 9999px;
+		background: var(--brand-color);
+	}
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		margin-top: -0.4375rem;
+		width: 1.25rem;
+		height: 1.25rem;
+		border-radius: 9999px;
+		background: var(--bg-page);
+		border: 2px solid var(--brand-color);
+		box-shadow: var(--ui-shadow-box);
+	}
+	&::-moz-range-thumb {
+		width: 1.25rem;
+		height: 1.25rem;
+		border-radius: 9999px;
+		background: var(--bg-page);
+		border: 2px solid var(--brand-color);
+	}
+	&:focus-visible::-webkit-slider-thumb {
+		outline: 2px solid var(--brand-color);
+		outline-offset: 2px;
+	}
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+/* ===== Chart tokens (Chart.tsx) =====
+   8-slot categorical palette (dataviz reference palette); light values by default, dark values on dark themes. */
+:root,
+[data-theme] {
+	--chart-1: #2a78d6;
+	--chart-2: #eb6834;
+	--chart-3: #1baf7a;
+	--chart-4: #eda100;
+	--chart-5: #e87ba4;
+	--chart-6: #008300;
+	--chart-7: #4a3aa7;
+	--chart-8: #e34948;
+}
+
+[data-theme='dark'],
+[data-theme$='-dark'] {
+	--chart-1: #3987e5;
+	--chart-2: #d95926;
+	--chart-3: #199e70;
+	--chart-4: #c98500;
+	--chart-5: #d55181;
+	--chart-6: #008300;
+	--chart-7: #9085e9;
+	--chart-8: #e66767;
+}
+
+@theme inline {
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-chart-6: var(--chart-6);
+	--color-chart-7: var(--chart-7);
+	--color-chart-8: var(--chart-8);
+}
+
+/* ===== Chat: streaming-text shimmer (Marker / Attachment) ===== */
+@theme {
+	--animate-pk-shimmer: pk-shimmer 2s linear infinite;
+
+	@keyframes pk-shimmer {
+		from {
+			background-position: 100% 0;
+		}
+		to {
+			background-position: -100% 0;
+		}
+	}
+}
+
+@utility pk-shimmer {
+	color: transparent;
+	background-color: var(--text-muted);
+	background-image: linear-gradient(100deg, transparent 35%, var(--text-main) 50%, transparent 65%);
+	background-size: 250% 100%;
+	background-repeat: no-repeat;
+	-webkit-background-clip: text;
+	background-clip: text;
+	animation: var(--animate-pk-shimmer);
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+		color: var(--text-muted);
+		background: none;
+	}
+}

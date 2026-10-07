@@ -1,109 +1,171 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { cn } from '../../utils';
-import { Theme, useAppTheme } from './ThemeContext';
+import React, { useMemo, useRef, useState } from 'react';
+import { cn } from '../../lib/cn';
+import { useClickOutside, useEscape } from '../../lib/dom';
+import { ChevronDownIcon } from '../../lib/icons';
+import { uiStyles, type ThemeDefinition, type UiStyle } from '../../theme/themes';
+import { useAppTheme } from './ThemeContext';
 
-const themeGroups = [
-	{
-		label: 'Classic',
-		options: [
-			{ id: 'light', name: 'White' },
-			{ id: 'dark', name: 'Deep Black' },
-		],
-	},
-	{
-		label: 'Ocean',
-		options: [
-			{ id: 'blue-light', name: 'Blue Light' },
-			{ id: 'blue-dark', name: 'Blue Dark' },
-		],
-	},
-	{
-		label: 'Forest',
-		options: [
-			{ id: 'green-light', name: 'Green Light' },
-			{ id: 'green-dark', name: 'Green Dark' },
-		],
-	},
-	{
-		label: 'Royal',
-		options: [
-			{ id: 'purple-light', name: 'Purple Light' },
-			{ id: 'purple-dark', name: 'Purple Dark' },
-		],
-	},
-	{
-		label: 'Flame',
-		options: [
-			{ id: 'red-light', name: 'Red Light' },
-			{ id: 'red-dark', name: 'Red Dark' },
-		],
-	},
-	{
-		label: 'Sun',
-		options: [
-			{ id: 'yellow-light', name: 'Yellow Light' },
-			{ id: 'yellow-dark', name: 'Yellow Dark' },
-		],
-	},
-];
+const SYSTEM_ID = 'system';
 
-export const ThemeSwitcher = () => {
-	const { theme, setTheme } = useAppTheme();
+interface ThemeSwitcherProps {
+	/** Add an "Auto (system)" entry at the top. */
+	showSystem?: boolean;
+	/** Limit the list to some groups, e.g. `['Classic', 'Ocean']`. */
+	groups?: string[];
+	/** Also render the UI-style (perks / panel / soft / silk) picker inside the dropdown. */
+	showUiStyles?: boolean;
+	className?: string;
+}
+
+export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ showSystem = false, groups: only, showUiStyles = false, className }) => {
+	const { theme, setTheme, ui, setUi, themes } = useAppTheme();
 	const [isOpen, setIsOpen] = useState(false);
-	const dropdownRef = useRef<HTMLDivElement>(null);
+	const ref = useRef<HTMLDivElement>(null);
+	useClickOutside(ref, () => setIsOpen(false), isOpen);
+	useEscape(() => setIsOpen(false), isOpen);
 
-	useEffect(() => {
-		const handleClickOutside = (e: MouseEvent) => {
-			if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setIsOpen(false);
-		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return () => document.removeEventListener('mousedown', handleClickOutside);
-	}, []);
+	const groups = useMemo(() => {
+		const map = new Map<string, ThemeDefinition[]>();
+		for (const t of themes) {
+			const g = t.group ?? 'Custom';
+			if (only && !only.includes(g)) continue;
+			map.set(g, [...(map.get(g) ?? []), t]);
+		}
+		return [...map.entries()];
+	}, [themes, only]);
 
-	const currentThemeName =
-		themeGroups.reduce<(typeof themeGroups)[0]['options']>((acc, g) => [...acc, ...g.options], []).find((o) => o.id === theme)?.name || 'Theme';
+	const current = theme === SYSTEM_ID ? 'Auto' : (themes.find((t) => t.id === theme)?.name ?? 'Theme');
+	const currentBrand = themes.find((t) => t.id === theme)?.colors.brand;
+
+	const pick = (id: string) => {
+		setTheme(id);
+		setIsOpen(false);
+	};
 
 	return (
-		<div className="relative inline-block text-left" ref={dropdownRef}>
+		<div className={cn('relative inline-block text-start', className)} ref={ref}>
 			<button
-				onClick={() => setIsOpen(!isOpen)}
-				className="flex items-center gap-2 px-4 py-2 border border-brand rounded-xl bg-page-bg text-page-text font-bold text-sm uppercase tracking-wider transition-all hover:bg-brand-bg active:scale-95 cursor-pointer"
+				type="button"
+				aria-haspopup="listbox"
+				aria-expanded={isOpen}
+				onClick={() => setIsOpen((v) => !v)}
+				className="ui-label flex items-center gap-2 px-4 py-2 ui-border rounded-control bg-control text-page-text text-sm transition-[color,background-color,border-color,box-shadow,transform,opacity] hover:bg-hover active:scale-95 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
 			>
-				<div className="w-3 h-3 rounded-full bg-brand" />
-				{currentThemeName}
-				<svg className={cn('w-4 h-4 transition-transform', isOpen && 'rotate-180')} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path d="M19 9l-7 7-7-7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-				</svg>
+				<span className="size-3 rounded-full bg-brand" style={currentBrand ? { backgroundColor: currentBrand } : undefined} />
+				{current}
+				<ChevronDownIcon className={cn('size-4 transition-transform', isOpen && 'rotate-180')} />
 			</button>
 
 			{isOpen && (
-				<div className="absolute right-0 mt-2 w-56 max-h-[400px] overflow-y-auto bg-page-bg border border-brand rounded-2xl shadow-2xl z-[100] animate-in fade-in zoom-in-95 duration-200">
-					<div className="p-2 space-y-4">
-						{themeGroups.map((group) => (
-							<div key={group.label}>
-								<p className="px-3 text-[10px] font-black uppercase text-page-text/40 mb-2">{group.label}</p>
+				<div className="absolute end-0 z-[100] mt-2 w-60 max-h-[420px] overflow-y-auto ui-border rounded-box bg-surface text-page-text shadow-pop animate-pk-pop-in pk-scrollbar">
+					<div role="listbox" aria-label="Theme" className="space-y-3 p-2">
+						{showSystem && (
+							<ThemeOption selected={theme === SYSTEM_ID} onClick={() => pick(SYSTEM_ID)}>
+								Auto (system)
+							</ThemeOption>
+						)}
+						{groups.map(([label, options]) => (
+							<div key={label}>
+								<p className="ui-label mb-1 px-3 text-[10px] text-muted">{label}</p>
 								<div className="grid grid-cols-1 gap-1">
-									{group.options.map((opt) => (
-										<button
-											key={opt.id}
-											onClick={() => {
-												setTheme(opt.id as Theme);
-												setIsOpen(false);
-											}}
-											className={cn(
-												'flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer',
-												theme === opt.id ? 'bg-brand text-page-bg' : 'text-page-text hover:bg-brand-bg',
-											)}
-										>
+									{options.map((opt) => (
+										<ThemeOption key={opt.id} selected={theme === opt.id} swatch={opt.colors.brand} onClick={() => pick(opt.id)}>
 											{opt.name}
-											{theme === opt.id && <div className="w-1.5 h-1.5 rounded-full bg-page-bg" />}
-										</button>
+										</ThemeOption>
 									))}
 								</div>
 							</div>
 						))}
+						{showUiStyles && (
+							<div className="border-t border-line/30 pt-2">
+								<p className="ui-label mb-1 px-3 text-[10px] text-muted">Style</p>
+								{uiStyles.map((s) => (
+									<ThemeOption key={s.id} selected={ui === s.id} onClick={() => setUi(s.id as UiStyle)}>
+										{s.name}
+									</ThemeOption>
+								))}
+							</div>
+						)}
 					</div>
 				</div>
+			)}
+		</div>
+	);
+};
+
+const ThemeOption = ({ selected, swatch, onClick, children }: { selected: boolean; swatch?: string; onClick: () => void; children: React.ReactNode }) => (
+	<button
+		type="button"
+		role="option"
+		aria-selected={selected}
+		onClick={onClick}
+		className={cn(
+			'flex w-full items-center justify-between gap-2 rounded-item px-3 py-2 text-start text-xs font-bold transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand',
+			selected ? 'bg-brand text-brand-fg' : 'text-page-text hover:bg-hover',
+		)}
+	>
+		<span className="flex items-center gap-2">
+			{swatch && <span className="size-2.5 rounded-full ring-1 ring-current/30" style={{ backgroundColor: swatch }} />}
+			{children}
+		</span>
+		{selected && <span className="size-1.5 rounded-full bg-current" />}
+	</button>
+);
+
+/** Standalone picker for the structural style (perks / panel / soft / silk). */
+export const UiStyleSwitcher: React.FC<{ className?: string }> = ({ className }) => {
+	const { ui, setUi } = useAppTheme();
+	return (
+		<div role="radiogroup" aria-label="UI style" className={cn('inline-flex gap-1 ui-border rounded-control bg-surface p-1', className)}>
+			{uiStyles.map((s) => (
+				<button
+					key={s.id}
+					type="button"
+					role="radio"
+					aria-checked={ui === s.id}
+					title={s.description}
+					onClick={() => setUi(s.id)}
+					className={cn(
+						'ui-label cursor-pointer rounded-control px-3 py-1.5 text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand',
+						ui === s.id ? 'bg-brand text-brand-fg' : 'text-page-text hover:bg-hover',
+					)}
+				>
+					{s.name}
+				</button>
+			))}
+		</div>
+	);
+};
+
+/** Lets the user pick their own brand colour on top of the active theme (stored via `setColors`; hover/tint shades are derived). */
+export const BrandColorPicker: React.FC<{ label?: string; resetLabel?: string; className?: string }> = ({ label = 'Brand colour', resetLabel = 'Reset', className }) => {
+	const { colors, setColors, resolvedTheme, themes } = useAppTheme();
+	const base = themes.find((t) => t.id === resolvedTheme)?.colors.brand ?? '#18181b';
+	const value = colors.brand ?? base;
+	const customised = !!colors.brand;
+
+	return (
+		<div className={cn('inline-flex items-center gap-3 text-page-text', className)}>
+			<label className="ui-label flex cursor-pointer items-center gap-2 text-xs">
+				<input
+					type="color"
+					value={/^#[0-9a-f]{6}$/i.test(value) ? value : base}
+					onChange={(e) => setColors({ ...colors, brand: e.target.value })}
+					className="size-8 cursor-pointer rounded-item border border-line bg-transparent p-0.5"
+				/>
+				{label}
+			</label>
+			{customised && (
+				<button
+					type="button"
+					onClick={() => {
+						const { brand: _brand, brandHover: _h, brandBg: _b, ...rest } = colors;
+						setColors(Object.keys(rest).length ? rest : null);
+					}}
+					className="ui-label cursor-pointer text-xs text-muted underline-offset-4 hover:text-page-text hover:underline"
+				>
+					{resetLabel}
+				</button>
 			)}
 		</div>
 	);

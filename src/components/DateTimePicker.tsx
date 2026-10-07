@@ -1,168 +1,107 @@
-// @ts-nocheck
-import dayjs, { Dayjs } from 'dayjs';
-import localeData from 'dayjs/plugin/localeData';
-import updateLocale from 'dayjs/plugin/updateLocale';
-import weekday from 'dayjs/plugin/weekday';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type { Dayjs } from 'dayjs';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { Portal } from '../lib/Portal';
+import { presenceAttrs, usePresence } from '../lib/presence';
+import { cn } from '../lib/cn';
+import { useAnchoredPosition, useClickOutside, useEscape } from '../lib/dom';
+import { CalendarIcon } from '../lib/icons';
+import { Calendar } from './Calendar';
+import { fieldStyles } from './Input';
 
-dayjs.extend(localeData);
-dayjs.extend(weekday);
-dayjs.extend(updateLocale);
-dayjs.updateLocale('en', {
-	weekStart: 1,
-});
-
-interface Props {
+export interface DateTimePickerProps {
 	value: Dayjs;
 	onChange: (date: Dayjs) => void;
 	dateFormat?: string;
+	/** Fired when the popup closes (outside click / Escape / trigger). */
 	onBlur?: () => void;
+	disabled?: boolean;
+	invalid?: boolean;
+	minDate?: Dayjs;
+	maxDate?: Dayjs;
+	weekStartsOn?: number;
+	/** `dropdown` (default) shows month and year selects; `label` shows plain text with arrows only. */
+	captionLayout?: 'label' | 'dropdown';
+	fromYear?: number;
+	toYear?: number;
+	hoursLabel?: string;
+	minutesLabel?: string;
+	className?: string;
 }
 
-export const DateTimePicker = React.forwardRef<HTMLDivElement, Props>(({ value, onChange, dateFormat = 'DD.MM.YYYY - HH:mm', onBlur }, ref) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const containerRef = useRef<HTMLDivElement>(null);
+const clamp = (n: number, max: number) => Math.min(max, Math.max(0, Number.isFinite(n) ? n : 0));
 
-	React.useImperativeHandle(ref, () => containerRef.current!);
+export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
+	({ value, onChange, dateFormat = 'DD.MM.YYYY - HH:mm', onBlur, disabled, invalid, minDate, maxDate, weekStartsOn, captionLayout = 'dropdown', fromYear, toYear, hoursLabel = 'Hours', minutesLabel = 'Minutes', className }, ref) => {
+		const [open, setOpen] = useState(false);
+		const containerRef = useRef<HTMLDivElement>(null);
+		const popupRef = useRef<HTMLDivElement>(null);
+		useImperativeHandle(ref, () => containerRef.current!);
 
-	useEffect(() => {
-		const handleClickOutside = (e: MouseEvent) => {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-				setIsOpen(false);
-				if (isOpen) onBlur?.();
-			}
+		// The popup is portalled with fixed positioning: it flips above the trigger near the bottom of the
+		// screen and is never clipped by a modal's overflow — no page scroll, no consumer CSS workarounds.
+		const { mounted, state } = usePresence(open);
+		const style = useAnchoredPosition(containerRef, popupRef, { open: mounted, gap: 8 });
+
+		const close = () => {
+			if (!open) return;
+			setOpen(false);
+			onBlur?.();
 		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return () => document.removeEventListener('mousedown', handleClickOutside);
-	}, [isOpen, onBlur]);
+		useClickOutside([containerRef, popupRef], close, open);
+		useEscape(close, open);
 
-	const years = useMemo(() => {
-		const currentYear = dayjs().year();
-		return Array.from({ length: 5 }, (_, i) => currentYear + i);
-	}, []);
+		const selectDay = (d: Dayjs) => onChange(value.year(d.year()).month(d.month()).date(d.date()));
 
-	const months = dayjs.months();
+		return (
+			<div ref={containerRef} className={cn('relative w-full', className)}>
+				<button
+					type="button"
+					disabled={disabled}
+					aria-haspopup="dialog"
+					aria-expanded={open}
+					aria-invalid={invalid || undefined}
+					onClick={() => (open ? close() : setOpen(true))}
+					className={cn(fieldStyles, 'flex items-center justify-between gap-2 px-(--ui-field-px) py-(--ui-field-py) text-left cursor-pointer')}
+				>
+					<span className="truncate">{value.format(dateFormat)}</span>
+					<CalendarIcon className="size-5 shrink-0 text-action" />
+				</button>
 
-	const days = useMemo(() => {
-		const startOfMonth = value.startOf('month');
-		const endOfMonth = value.endOf('month');
-
-		const startGrid = startOfMonth.startOf('week');
-		const endGrid = endOfMonth.endOf('week');
-
-		const calendar = [];
-		let date = startGrid;
-
-		while (date.isBefore(endGrid) || date.isSame(endGrid, 'day')) {
-			calendar.push(date);
-			date = date.add(1, 'day');
-		}
-		return calendar;
-	}, [value]);
-
-	return (
-		<div className="relative w-full inline-block font-sans" ref={containerRef}>
-			<div
-				onClick={() => setIsOpen(!isOpen)}
-				className="flex items-center justify-between min-w-60 px-4 py-2.5 border border-brand rounded-xl cursor-pointer bg-page-bg hover:bg-brand-bg transition-all duration-300 shadow-sm"
-			>
-				<span className="text-page-text font-medium">{value.format(dateFormat)}</span>
-				<svg className="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						strokeWidth={1.5}
-						d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-					/>
-				</svg>
-			</div>
-
-			{isOpen && (
-				<div className="absolute z-50 mt-2 p-4 bg-page-bg border border-brand rounded-2xl shadow-2xl w-[320px] transition-colors duration-300">
-					<div className="flex gap-2 mb-4">
-						<select
-							value={value.year()}
-							onChange={(e) => onChange(value.year(parseInt(e.target.value)))}
-							className="flex-1 p-2 bg-brand-bg border border-brand/20 rounded-lg text-sm font-semibold outline-none focus:border-brand text-page-text cursor-pointer transition-all"
-						>
-							{years.map((y) => (
-								<option key={y} value={y}>
-									{y}
-								</option>
-							))}
-						</select>
-						<select
-							value={value.month()}
-							onChange={(e) => onChange(value.month(parseInt(e.target.value)))}
-							className="flex-1 p-2 bg-brand-bg border border-brand/20 rounded-lg text-sm font-semibold outline-none focus:border-brand text-page-text cursor-pointer transition-all"
-						>
-							{months.map((m, i) => (
-								<option key={m} value={i}>
-									{m}
-								</option>
-							))}
-						</select>
-					</div>
-
-					<div className="grid grid-cols-7 mb-2">
-						{['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d) => (
-							<div key={d} className="text-center text-[11px] font-bold text-page-text/40 uppercase py-1">
-								{d}
+				{mounted && (
+					<Portal>
+						<div data-pk-layer="" ref={popupRef} role="dialog" style={style} {...presenceAttrs(state)} className={cn('z-[200] w-80 overflow-y-auto ui-border border-line rounded-box bg-surface p-4 text-page-text shadow-pop', state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none')}>
+							<Calendar value={value} onSelect={selectDay} minDate={minDate} maxDate={maxDate} weekStartsOn={weekStartsOn} captionLayout={captionLayout} fromYear={fromYear} toYear={toYear} />
+							<div className="mt-4 flex items-center justify-center gap-3 border-t border-line/30 pt-4">
+								<label className="text-center">
+									<span className="ui-label mb-1 block text-[10px] text-muted">{hoursLabel}</span>
+									<input
+										type="number"
+										min={0}
+										max={23}
+										value={value.hour()}
+										onChange={(e) => onChange(value.hour(clamp(parseInt(e.target.value, 10), 23)))}
+										className="w-16 rounded-field ui-border border-line bg-control p-2 text-center font-mono text-sm outline-none focus:border-brand"
+									/>
+								</label>
+								<span className="mt-4 text-xl font-bold text-muted">:</span>
+								<label className="text-center">
+									<span className="ui-label mb-1 block text-[10px] text-muted">{minutesLabel}</span>
+									<input
+										type="number"
+										min={0}
+										max={59}
+										value={value.minute()}
+										onChange={(e) => onChange(value.minute(clamp(parseInt(e.target.value, 10), 59)))}
+										className="w-16 rounded-field ui-border border-line bg-control p-2 text-center font-mono text-sm outline-none focus:border-brand"
+									/>
+								</label>
 							</div>
-						))}
-					</div>
-
-					<div className="grid grid-cols-7 gap-1">
-						{days.map((date, i) => {
-							const isCurrentMonth = date.month() === value.month();
-							const isSelected = date.isSame(value, 'day');
-
-							return (
-								<button
-									type="button"
-									key={i}
-									onClick={() => onChange(value.date(date.date()).month(date.month()).year(date.year()))}
-									className={`
-                    h-9 w-9 text-sm rounded-lg flex items-center justify-center transition-all duration-200
-                    ${!isCurrentMonth ? 'text-page-text/20' : 'font-medium'}
-                    ${isSelected ? 'bg-brand text-page-bg' : 'hover:bg-brand-bg'}
-                  `}
-								>
-									{date.date()}
-								</button>
-							);
-						})}
-					</div>
-
-					<div className="mt-4 pt-4 border-t border-brand/10 flex items-center justify-center gap-3">
-						<div className="text-center">
-							<p className="text-[10px] text-page-text/40 uppercase font-bold mb-1">Hours</p>
-							<input
-								type="number"
-								min="0"
-								max="23"
-								value={value.hour()}
-								onChange={(e) => onChange(value.hour(parseInt(e.target.value) || 0))}
-								className="w-14 p-2 text-center bg-brand-bg border border-brand/20 rounded-lg font-mono text-sm focus:border-brand text-page-text outline-none transition-all"
-							/>
 						</div>
-						<span className="text-xl font-bold text-brand/30 mt-4">:</span>
-						<div className="text-center">
-							<p className="text-[10px] text-page-text/40 uppercase font-bold mb-1">Minutes</p>
-							<input
-								type="number"
-								min="0"
-								max="59"
-								value={value.minute()}
-								onChange={(e) => onChange(value.minute(parseInt(e.target.value) || 0))}
-								className="w-14 p-2 text-center bg-brand-bg border border-brand/20 rounded-lg font-mono text-sm focus:border-brand text-page-text outline-none transition-all"
-							/>
-						</div>
-					</div>
-				</div>
-			)}
-		</div>
-	);
-});
+					</Portal>
+				)}
+			</div>
+		);
+	},
+);
 
 DateTimePicker.displayName = 'DateTimePicker';

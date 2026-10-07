@@ -1,0 +1,276 @@
+[
+	{
+		"id": "light",
+		"name": "White",
+		"group": "Classic",
+		"mode": "light",
+		"colors": {
+			"brand": "#18181b",
+			"brandHover": "#000000",
+			"brandBg": "#f4f4f5",
+			"background": "#fafafa",
+			"foreground": "#18181b"
+		}
+	},
+	{
+		"id": "dark",
+		"name": "Deep Black",
+		"group": "Classic",
+		"mode": "dark",
+		"colors": {
+			"brand": "#ffffff",
+			"brandHover": "#f4f4f5",
+			"brandBg": "#27272a",
+			"background": "#16161b",
+			"foreground": "#f4f4f5"
+		}
+	},
+	{
+		"id": "blue-light",
+		"name": "Blue Light",
+		"group": "Ocean",
+		"mode": "light",
+		"colors": {
+			"brand": "#2563eb",
+			"brandHover": "#1d4ed8",
+			"brandBg": "#dbeafe",
+			"background": "#f0f7ff",
+			"foreground": "#1e3a8a"
+		}
+	},
+	{
+		"id": "blue-dark",
+		"name": "Blue Dark",
+		"group": "Ocean",
+		"mode": "dark",
+		"colors": {
+			"brand": "#60a5fa",
+			"brandHover": "#93c5fd",
+			"brandBg": "#1e3a8a",
+			"background": "#0f172a",
+			"foreground": "#f1f5f9"
+		}
+	},
+	{
+		"id": "green-light",
+		"name": "Green Light",
+		"group": "Forest",
+		"mode": "light",
+		"colors": {
+			"brand": "#16a34a",
+			"brandHover": "#15803d",
+			"brandBg": "#dcfce7",
+			"background": "#f0fdf4",
+			"foreground": "#14532d"
+		}
+	},
+	{
+		"id": "green-dark",
+		"name": "Green Dark",
+		"group": "Forest",
+		"mode": "dark",
+		"colors": {
+			"brand": "#4ade80",
+			"brandHover": "#86efac",
+			"brandBg": "#14532d",
+			"background": "#061f10",
+			"foreground": "#f0fdf4"
+		}
+	},
+	{
+		"id": "purple-light",
+		"name": "Purple Light",
+		"group": "Royal",
+		"mode": "light",
+		"colors": {
+			"brand": "#9333ea",
+			"brandHover": "#7e22ce",
+			"brandBg": "#f3e8ff",
+			"background": "#faf5ff",
+			"foreground": "#581c87"
+		}
+	},
+	{
+		"id": "purple-dark",
+		"name": "Purple Dark",
+		"group": "Royal",
+		"mode": "dark",
+		"colors": {
+			"brand": "#c084fc",
+			"brandHover": "#d8b4fe",
+			"brandBg": "#581c87",
+			"background": "#1a1033",
+			"foreground": "#faf5ff"
+		}
+	},
+	{
+		"id": "red-light",
+		"name": "Red Light",
+		"group": "Flame",
+		"mode": "light",
+		"colors": {
+			"brand": "#dc2626",
+			"brandHover": "#b91c1c",
+			"brandBg": "#fee2e2",
+			"background": "#fef2f2",
+			"foreground": "#7f1d1d"
+		}
+	},
+	{
+		"id": "red-dark",
+		"name": "Red Dark",
+		"group": "Flame",
+		"mode": "dark",
+		"colors": {
+			"brand": "#f87171",
+			"brandHover": "#fca5a5",
+			"brandBg": "#7f1d1d",
+			"background": "#1a0505",
+			"foreground": "#fef2f2"
+		}
+	},
+	{
+		"id": "yellow-light",
+		"name": "Yellow Light",
+		"group": "Sun",
+		"mode": "light",
+		"colors": {
+			"brand": "#d97706",
+			"brandHover": "#b45309",
+			"brandBg": "#fef3c7",
+			"background": "#fffbeb",
+			"foreground": "#713f12"
+		}
+	},
+	{
+		"id": "yellow-dark",
+		"name": "Yellow Dark",
+		"group": "Sun",
+		"mode": "dark",
+		"colors": {
+			"brand": "#fbbf24",
+			"brandHover": "#fcd34d",
+			"brandBg": "#713f12",
+			"background": "#1c1505",
+			"foreground": "#fffbeb"
+		}
+	},
+	{
+		"id": "indigo-light",
+		"name": "Indigo Light",
+		"group": "Indigo",
+		"mode": "light",
+		"colors": {
+			"brand": "#4f46e5",
+			"brandHover": "#4338ca",
+			"brandBg": "#eef2ff",
+			"background": "#ffffff",
+			"foreground": "#1e293b"
+		}
+	},
+	{
+		"id": "indigo-dark",
+		"name": "Indigo Dark",
+		"group": "Indigo",
+		"mode": "dark",
+		"colors": {
+			"brand": "#818cf8",
+			"brandHover": "#a5b4fc",
+			"brandBg": "#312e81",
+			"background": "#0f1020",
+			"foreground": "#e0e7ff"
+		}
+	},
+	{
+		"id": "orange-light",
+		"name": "Sunrise Light",
+		"group": "Sunrise",
+		"mode": "light",
+		"colors": {
+			"brand": "#e1552f",
+			"brandHover": "#c9431f",
+			"brandBg": "#fdf3ee",
+			"background": "#f7f3ec",
+			"foreground": "#292524"
+		}
+	},
+	{
+		"id": "orange-dark",
+		"name": "Sunrise Dark",
+		"group": "Sunrise",
+		"mode": "dark",
+		"colors": {
+			"brand": "#eda47d",
+			"brandHover": "#f5c7ae",
+			"brandBg": "#602012",
+			"background": "#1c1410",
+			"foreground": "#f5ebe0"
+		}
+	},
+	{
+		"id": "paper-light",
+		"name": "Paper Light",
+		"group": "Paper",
+		"mode": "light",
+		"colors": {
+			"brand": "#161616",
+			"brandHover": "#000000",
+			"brandBg": "#efeee9",
+			"background": "#faf9f6",
+			"foreground": "#161616",
+			"panel": "#ffffff",
+			"border": "#d9d6cf",
+			"muted": "#6b6862",
+			"danger": "#b3261e"
+		}
+	},
+	{
+		"id": "paper-dark",
+		"name": "Paper Dark",
+		"group": "Paper",
+		"mode": "dark",
+		"colors": {
+			"brand": "#f4f2ec",
+			"brandHover": "#ffffff",
+			"brandBg": "#3d3c37",
+			"background": "#2a2926",
+			"foreground": "#f4f2ec",
+			"panel": "#33322e",
+			"border": "#4a4842",
+			"muted": "#aaa69c",
+			"danger": "#ff8a80"
+		}
+	},
+	{
+		"id": "neutral-light",
+		"name": "Neutral Light",
+		"group": "Shadcn",
+		"mode": "light",
+		"colors": {
+			"brand": "#171717",
+			"brandHover": "#262626",
+			"brandBg": "#f5f5f5",
+			"background": "#ffffff",
+			"foreground": "#0a0a0a",
+			"panel": "#fafafa",
+			"border": "#e5e5e5",
+			"muted": "#737373"
+		}
+	},
+	{
+		"id": "neutral-dark",
+		"name": "Neutral Dark",
+		"group": "Shadcn",
+		"mode": "dark",
+		"colors": {
+			"brand": "#fafafa",
+			"brandHover": "#e5e5e5",
+			"brandBg": "#262626",
+			"background": "#0a0a0a",
+			"foreground": "#fafafa",
+			"panel": "#171717",
+			"border": "#262626",
+			"muted": "#a3a3a3"
+		}
+	}
+]

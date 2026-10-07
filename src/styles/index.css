@@ -1,0 +1,15 @@
+/*
+ * perkslab-ui styles. In the consumer's main stylesheet:
+ *
+ *   @import 'tailwindcss';
+ *   @import 'perkslab-ui/styles.css';
+ *
+ * Then pick a look on <html> (or let <ThemeProvider> do it):
+ *   data-theme="blue-dark"   colours — see colors.css / ThemeProvider `themes` for your own
+ *   data-ui="silk"           structure — perks | panel | soft | silk
+ */
+@source "../";
+
+@import './tokens.css';
+@import './ui.css';
+@import './colors.css';

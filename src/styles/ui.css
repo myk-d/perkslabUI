@@ -1,0 +1,168 @@
+/*
+ * UI styles — the structural half of a theme. Pick one with <html data-ui="…"> (ThemeProvider `ui`).
+ *   perks  – the original look: big radii, brand-coloured borders, heavy uppercase headings
+ *   panel  – flat/dense admin look: small radii, neutral borders, Inter-style headings
+ *   soft   – friendly look: pill buttons, hairline borders, calm headings
+ *   shadcn – neutral, compact controls (the shadcn/ui look)
+ *   silk   – editorial look: square corners, 2px ink borders, serif headings, uppercase labels
+ */
+:root,
+[data-ui='perks'],
+:root [data-theme] {
+	--ui-radius-control: 0.75rem;
+	--ui-field-px: 1rem;
+	--ui-field-py: 0.625rem;
+	--ui-field-text: 1rem;
+	--ui-btn-px: 1.5rem;
+	--ui-btn-py: 0.75rem;
+	--ui-btn-text: 1rem;
+	--ui-radius-field: 0.75rem;
+	--ui-radius-box: 1rem;
+	--ui-radius-item: 0.5rem;
+
+	--ui-border-w: 1px;
+	--ui-line: var(--brand-color);
+	--ui-surface: var(--bg-page);
+	--ui-control-bg: var(--bg-page);
+	--ui-hover: var(--brand-bg);
+	--ui-action-fg: var(--brand-color);
+
+	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--ui-shadow-pop: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+	--ui-font-heading: inherit;
+	--ui-heading-weight: 900;
+	--ui-heading-case: uppercase;
+	--ui-heading-track: -0.05em;
+	--ui-label-weight: 700;
+	--ui-label-case: uppercase;
+	--ui-label-track: 0.05em;
+}
+
+[data-ui='panel'],
+[data-ui='panel'] [data-theme] {
+	--ui-radius-control: 0.375rem;
+	--ui-field-px: 0.875rem;
+	--ui-field-py: 0.5rem;
+	--ui-field-text: 0.875rem;
+	--ui-btn-px: 1.25rem;
+	--ui-btn-py: 0.5rem;
+	--ui-btn-text: 0.875rem;
+	--ui-radius-field: 0.375rem;
+	--ui-radius-box: 0.5rem;
+	--ui-radius-item: 0.375rem;
+
+	--ui-border-w: 1px;
+	--ui-line: var(--panel-border);
+	--ui-surface: var(--bg-panel);
+	--ui-control-bg: var(--bg-panel);
+	--ui-hover: color-mix(in srgb, var(--text-main) 6%, transparent);
+	--ui-action-fg: var(--text-main);
+
+	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.06);
+	--ui-shadow-pop: 0 10px 30px -10px rgb(0 0 0 / 0.3);
+
+	--ui-font-heading: inherit;
+	--ui-heading-weight: 700;
+	--ui-heading-case: none;
+	--ui-heading-track: -0.01em;
+	--ui-label-weight: 500;
+	--ui-label-case: none;
+	--ui-label-track: 0;
+}
+
+[data-ui='soft'],
+[data-ui='soft'] [data-theme] {
+	--ui-radius-control: 9999px;
+	--ui-field-px: 1rem;
+	--ui-field-py: 0.625rem;
+	--ui-field-text: 1rem;
+	--ui-btn-px: 1.5rem;
+	--ui-btn-py: 0.75rem;
+	--ui-btn-text: 1rem;
+	--ui-radius-field: 0.75rem;
+	--ui-radius-box: 1rem;
+	--ui-radius-item: 0.625rem;
+
+	--ui-border-w: 1px;
+	--ui-line: color-mix(in srgb, var(--text-main) 14%, transparent);
+	--ui-surface: var(--bg-panel);
+	--ui-control-bg: var(--bg-panel);
+	--ui-hover: var(--brand-bg);
+	--ui-action-fg: var(--brand-color);
+
+	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+	--ui-shadow-pop: 0 12px 32px -8px rgb(0 0 0 / 0.22);
+
+	--ui-font-heading: inherit;
+	--ui-heading-weight: 600;
+	--ui-heading-case: none;
+	--ui-heading-track: -0.01em;
+	--ui-label-weight: 500;
+	--ui-label-case: none;
+	--ui-label-track: 0;
+}
+
+[data-ui='silk'],
+[data-ui='silk'] [data-theme] {
+	--ui-radius-control: 0;
+	--ui-field-px: 1rem;
+	--ui-field-py: 0.625rem;
+	--ui-field-text: 1rem;
+	--ui-btn-px: 1.5rem;
+	--ui-btn-py: 0.75rem;
+	--ui-btn-text: 1rem;
+	--ui-radius-field: 0;
+	--ui-radius-box: 0;
+	--ui-radius-item: 0;
+
+	--ui-border-w: 2px;
+	--ui-line: var(--text-main);
+	--ui-surface: var(--bg-panel);
+	--ui-control-bg: var(--bg-panel);
+	--ui-hover: color-mix(in srgb, var(--text-main) 8%, transparent);
+	--ui-action-fg: var(--text-main);
+
+	--ui-shadow-box: none;
+	--ui-shadow-pop: none;
+
+	--ui-font-heading: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+	--ui-heading-weight: 400;
+	--ui-heading-case: none;
+	--ui-heading-track: -0.02em;
+	--ui-label-weight: 600;
+	--ui-label-case: uppercase;
+	--ui-label-track: 0.12em;
+}
+
+[data-ui='shadcn'],
+[data-ui='shadcn'] [data-theme] {
+	--ui-radius-control: 0.5rem;
+	--ui-radius-field: 0.5rem;
+	--ui-radius-box: 0.75rem;
+	--ui-radius-item: 0.375rem;
+	--ui-field-px: 0.75rem;
+	--ui-field-py: 0.4375rem;
+	--ui-field-text: 0.875rem;
+	--ui-btn-px: 1rem;
+	--ui-btn-py: 0.4375rem;
+	--ui-btn-text: 0.875rem;
+
+	--ui-border-w: 1px;
+	--ui-line: var(--panel-border);
+	--ui-surface: var(--bg-page);
+	--ui-control-bg: transparent;
+	--ui-hover: color-mix(in srgb, var(--text-main) 7%, transparent);
+	--ui-action-fg: var(--text-main);
+
+	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--ui-shadow-pop: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+	--ui-font-heading: inherit;
+	--ui-heading-weight: 600;
+	--ui-heading-case: none;
+	--ui-heading-track: -0.025em;
+	--ui-label-weight: 500;
+	--ui-label-case: none;
+	--ui-label-track: 0;
+}
