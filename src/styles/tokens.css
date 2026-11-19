@@ -3,7 +3,7 @@
  *
  * Two independent axes drive every component:
  *   - data-theme  -> colours   (see colors.css)
- *   - data-ui     -> structure (radius, borders, fonts, shadows — see ui.css)
+ *   - data-ui     -> structure (radius, borders, fonts, shadows, motion — see ui.css)
  *
  * Components only ever use the utilities mapped here (bg-brand, rounded-control, border-line, ...),
  * so switching either attribute re-skins the whole library with no re-render.
@@ -18,24 +18,36 @@
 	--color-brand-fg: var(--brand-fg);
 	--color-page-bg: var(--bg-page);
 	--color-page-text: var(--text-main);
+	--color-secondary: var(--text-secondary);
 	--color-panel: var(--bg-panel);
 	--color-panel-border: var(--panel-border);
 	--color-muted: var(--text-muted);
-	--color-danger: var(--c-danger);
-	--color-ok: var(--c-ok);
-	--color-warning: var(--c-warning);
-	--color-info: var(--c-info);
+	--color-scrim: var(--bg-scrim);
 
-	/* structure-aware colours */
+	--color-danger: var(--c-danger);
+	--color-danger-fg: var(--c-danger-fg);
+	--color-ok: var(--c-ok);
+	--color-ok-fg: var(--c-ok-fg);
+	--color-warning: var(--c-warning);
+	--color-warning-fg: var(--c-warning-fg);
+	--color-info: var(--c-info);
+	--color-info-fg: var(--c-info-fg);
+
+	/* structure-aware colours & surfaces */
 	--color-surface: var(--ui-surface);
+	--color-elevated: var(--ui-elevated);
+	--color-subtle: var(--ui-subtle);
 	--color-control: var(--ui-control-bg);
 	--color-line: var(--ui-line);
+	--color-line-subtle: var(--ui-line-subtle);
+	--color-line-strong: var(--ui-line-strong);
 	--color-hover: var(--ui-hover);
 	--color-action: var(--ui-action-fg);
 
 	--radius-control: var(--ui-radius-control);
 	--radius-field: var(--ui-radius-field);
 	--radius-box: var(--ui-radius-box);
+	--radius-pop: var(--ui-radius-pop);
 	--radius-item: var(--ui-radius-item);
 
 	--shadow-box: var(--ui-shadow-box);
@@ -45,24 +57,32 @@
 }
 
 @theme {
-	--animate-pk-fade-in: pk-fade-in 150ms ease-out;
-	--animate-pk-pop-in: pk-pop-in 150ms ease-out;
-	--animate-pk-slide-up: pk-slide-up 200ms ease-out;
-	--animate-pk-slide-in-right: pk-slide-in-right 220ms ease-out;
-	--animate-pk-slide-in-left: pk-slide-in-left 220ms ease-out;
-	--animate-pk-slide-in-top: pk-slide-in-top 220ms ease-out;
-	--animate-pk-slide-in-bottom: pk-slide-in-bottom 220ms ease-out;
-	--animate-pk-toast-in: pk-toast-in 250ms ease-out;
-	--animate-pk-toast-out: pk-toast-out 150ms ease-in forwards;
-	--animate-pk-collapse: pk-collapse 200ms ease-out;
-	--animate-pk-fade-out: pk-fade-out 150ms ease-in forwards;
-	--animate-pk-pop-out: pk-pop-out 150ms ease-in forwards;
-	--animate-pk-slide-down: pk-slide-down 150ms ease-in forwards;
-	--animate-pk-slide-out-right: pk-slide-out-right 180ms ease-in forwards;
-	--animate-pk-slide-out-left: pk-slide-out-left 180ms ease-in forwards;
-	--animate-pk-slide-out-top: pk-slide-out-top 180ms ease-in forwards;
-	--animate-pk-slide-out-bottom: pk-slide-out-bottom 180ms ease-in forwards;
-	--animate-pk-collapse-out: pk-collapse-out 150ms ease-in forwards;
+	/* Motion easing tokens (distilled from CrossPoint, Silkscreen, Hey Taby & iOS/Drawer physics) */
+	--ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+	--animate-pk-fade-in: pk-fade-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-pk-fade-out: pk-fade-out 130ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-pop-in: pk-pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-pk-pop-out: pk-pop-out 130ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-slide-up: pk-slide-up 220ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-pk-slide-down: pk-slide-down 140ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-slide-in-right: pk-slide-in-right 260ms cubic-bezier(0.32, 0.72, 0, 1);
+	--animate-pk-slide-in-left: pk-slide-in-left 260ms cubic-bezier(0.32, 0.72, 0, 1);
+	--animate-pk-slide-in-top: pk-slide-in-top 260ms cubic-bezier(0.32, 0.72, 0, 1);
+	--animate-pk-slide-in-bottom: pk-slide-in-bottom 260ms cubic-bezier(0.32, 0.72, 0, 1);
+	--animate-pk-slide-out-right: pk-slide-out-right 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-slide-out-left: pk-slide-out-left 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-slide-out-top: pk-slide-out-top 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-slide-out-bottom: pk-slide-out-bottom 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-toast-in: pk-toast-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-pk-toast-out: pk-toast-out 160ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-collapse: pk-collapse 200ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-pk-collapse-out: pk-collapse-out 140ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	--animate-pk-tab-in: pk-tab-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
 
 	@keyframes pk-fade-in {
 		from {
@@ -72,29 +92,46 @@
 			opacity: 1;
 		}
 	}
+	@keyframes pk-fade-out {
+		to {
+			opacity: 0;
+		}
+	}
 	@keyframes pk-pop-in {
 		from {
 			opacity: 0;
-			transform: scale(0.96) translateY(-4px);
+			transform: translate3d(var(--pk-pop-x, 0px), var(--pk-pop-y, -6px), 0) scale(0.96);
 		}
 		to {
 			opacity: 1;
 			transform: none;
+		}
+	}
+	@keyframes pk-pop-out {
+		to {
+			opacity: 0;
+			transform: translate3d(var(--pk-pop-x, 0px), var(--pk-pop-y, -6px), 0) scale(0.96);
 		}
 	}
 	@keyframes pk-slide-up {
 		from {
 			opacity: 0;
-			transform: translateY(1rem) scale(0.97);
+			transform: translate3d(0, 8px, 0) scale(0.97);
 		}
 		to {
 			opacity: 1;
 			transform: none;
 		}
 	}
+	@keyframes pk-slide-down {
+		to {
+			opacity: 0;
+			transform: translate3d(0, 6px, 0) scale(0.98);
+		}
+	}
 	@keyframes pk-slide-in-right {
 		from {
-			transform: translateX(100%);
+			transform: translate3d(100%, 0, 0);
 		}
 		to {
 			transform: none;
@@ -102,7 +139,7 @@
 	}
 	@keyframes pk-slide-in-left {
 		from {
-			transform: translateX(-100%);
+			transform: translate3d(-100%, 0, 0);
 		}
 		to {
 			transform: none;
@@ -110,7 +147,7 @@
 	}
 	@keyframes pk-slide-in-top {
 		from {
-			transform: translateY(-100%);
+			transform: translate3d(0, -100%, 0);
 		}
 		to {
 			transform: none;
@@ -118,16 +155,36 @@
 	}
 	@keyframes pk-slide-in-bottom {
 		from {
-			transform: translateY(100%);
+			transform: translate3d(0, 100%, 0);
 		}
 		to {
 			transform: none;
 		}
 	}
+	@keyframes pk-slide-out-right {
+		to {
+			transform: translate3d(100%, 0, 0);
+		}
+	}
+	@keyframes pk-slide-out-left {
+		to {
+			transform: translate3d(-100%, 0, 0);
+		}
+	}
+	@keyframes pk-slide-out-top {
+		to {
+			transform: translate3d(0, -100%, 0);
+		}
+	}
+	@keyframes pk-slide-out-bottom {
+		to {
+			transform: translate3d(0, 100%, 0);
+		}
+	}
 	@keyframes pk-toast-in {
 		from {
 			opacity: 0;
-			transform: translateX(1rem);
+			transform: translate3d(var(--pk-toast-x, 1rem), var(--pk-toast-y, 0px), 0) scale(0.96);
 		}
 		to {
 			opacity: 1;
@@ -137,7 +194,7 @@
 	@keyframes pk-toast-out {
 		to {
 			opacity: 0;
-			transform: translateX(1rem);
+			transform: translate3d(var(--pk-toast-out-x, var(--pk-toast-x, 1rem)), var(--pk-toast-y, 0px), 0) scale(0.96);
 		}
 	}
 	@keyframes pk-collapse {
@@ -150,49 +207,40 @@
 			transform: none;
 		}
 	}
-	@keyframes pk-fade-out {
-		to {
-			opacity: 0;
-		}
-	}
-	@keyframes pk-pop-out {
-		to {
-			opacity: 0;
-			transform: scale(0.96) translateY(-4px);
-		}
-	}
-	@keyframes pk-slide-down {
-		to {
-			opacity: 0;
-			transform: translateY(1rem) scale(0.97);
-		}
-	}
-	@keyframes pk-slide-out-right {
-		to {
-			transform: translateX(100%);
-		}
-	}
-	@keyframes pk-slide-out-left {
-		to {
-			transform: translateX(-100%);
-		}
-	}
-	@keyframes pk-slide-out-top {
-		to {
-			transform: translateY(-100%);
-		}
-	}
-	@keyframes pk-slide-out-bottom {
-		to {
-			transform: translateY(100%);
-		}
-	}
 	@keyframes pk-collapse-out {
 		to {
 			opacity: 0;
 			transform: translateY(-0.25rem);
 		}
 	}
+	@keyframes pk-tab-in {
+		from {
+			opacity: 0;
+			transform: translate3d(0, 4px, 0);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+}
+
+/* Directional popup offsets — popovers/menus/calendars animate outward from their anchor edge. */
+[data-pk-layer][data-side='bottom'] {
+	--pk-pop-x: 0px;
+	--pk-pop-y: -6px;
+}
+[data-pk-layer][data-side='top'] {
+	--pk-pop-x: 0px;
+	--pk-pop-y: 6px;
+}
+[data-pk-layer][data-side='right'] {
+	--pk-pop-x: -6px;
+	--pk-pop-y: 0px;
+}
+[data-pk-layer][data-side='left'] {
+	--pk-pop-x: 6px;
+	--pk-pop-y: 0px;
 }
 
 /* ===== Reduced motion: disables every pk animation (presence uses 0ms exit in JS) ===== */
@@ -226,7 +274,7 @@
 
 @utility pk-scrollbar {
 	scrollbar-width: thin;
-	scrollbar-color: var(--brand-bg) transparent;
+	scrollbar-color: color-mix(in srgb, var(--text-main) 22%, transparent) transparent;
 }
 
 /* Native range input skinned with theme tokens (Slider). `--pk-fill` is set inline to the filled percentage. */
@@ -257,16 +305,25 @@
 		width: 1.25rem;
 		height: 1.25rem;
 		border-radius: 9999px;
-		background: var(--bg-page);
+		background: var(--ui-elevated);
 		border: 2px solid var(--brand-color);
 		box-shadow: var(--ui-shadow-box);
+		transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	&:hover::-webkit-slider-thumb {
+		transform: scale(1.08);
+	}
+	&:active::-webkit-slider-thumb {
+		transform: scale(0.96);
 	}
 	&::-moz-range-thumb {
 		width: 1.25rem;
 		height: 1.25rem;
 		border-radius: 9999px;
-		background: var(--bg-page);
+		background: var(--ui-elevated);
 		border: 2px solid var(--brand-color);
+		box-shadow: var(--ui-shadow-box);
+		transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 	&:focus-visible::-webkit-slider-thumb {
 		outline: 2px solid var(--brand-color);
@@ -315,9 +372,10 @@
 	--color-chart-8: var(--chart-8);
 }
 
-/* ===== Chat: streaming-text shimmer (Marker / Attachment) ===== */
+/* ===== Chat & Skeleton shimmer ===== */
 @theme {
 	--animate-pk-shimmer: pk-shimmer 2s linear infinite;
+	--animate-pk-skeleton: pk-skeleton 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 
 	@keyframes pk-shimmer {
 		from {
@@ -325,6 +383,14 @@
 		}
 		to {
 			background-position: -100% 0;
+		}
+	}
+	@keyframes pk-skeleton {
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
 		}
 	}
 }
@@ -342,5 +408,17 @@
 		animation: none;
 		color: var(--text-muted);
 		background: none;
+	}
+}
+
+@utility pk-skeleton {
+	background-color: var(--ui-subtle);
+	background-image: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--text-main) 7%, transparent) 50%, transparent 100%);
+	background-size: 200% 100%;
+	background-repeat: no-repeat;
+	animation: var(--animate-pk-skeleton);
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+		background-image: none;
 	}
 }

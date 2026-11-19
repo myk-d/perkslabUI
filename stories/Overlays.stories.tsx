@@ -1,8 +1,10 @@
+import dayjs, { type Dayjs } from 'dayjs';
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
-	Button, Checkbox, ConfirmService, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, Field, Input, Modal, ModalActionButton,
-	ModalCloseButton, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle, ModalTrigger, Popover, PopoverContent, PopoverTrigger, Sheet, SheetContent, SheetDescription, SheetTitle,
-	SheetClose, SheetFooter, SheetHeader, SheetTrigger, ToastService, Tooltip, useConfirm,
+	Button, Checkbox, ConfirmService, DatePicker, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, Field, Input, Modal, ModalActionButton,
+	ModalCloseButton, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle, ModalTrigger, Popover, PopoverContent, PopoverTrigger, Select, Sheet, SheetContent, SheetDescription, SheetTitle,
+	SheetClose, SheetFooter, SheetHeader, SheetTrigger, ThemeProvider, ThemeSwitcher, ToastService, Tooltip, useConfirm,
 } from 'perkslab-ui';
 
 const meta = { title: 'Overlays/Overview', parameters: { layout: 'padded' } } satisfies Meta;
@@ -88,4 +90,56 @@ export const Floating: Story = {
 			</DropdownMenu>
 		</div>
 	),
+};
+
+export const NestedStacking: Story = {
+	render: () => {
+		const [date, setDate] = useState<Dayjs | null>(dayjs('2026-06-15'));
+		const [country, setCountry] = useState('ua');
+		const [modalOpen, setModalOpen] = useState(false);
+		return (
+			<ThemeProvider persist={false}>
+				<div className="flex flex-wrap items-center gap-4">
+					<Modal>
+						<ModalTrigger asChild><Button>Modal with pickers</Button></ModalTrigger>
+						<ModalContent>
+							<ModalHeader>
+								<ModalTitle>Schedule</ModalTitle>
+								<ModalDescription>Escape closes only the topmost picker, keeping the modal open.</ModalDescription>
+							</ModalHeader>
+							<Select
+								label="Country"
+								searchable
+								value={country}
+								onChange={setCountry}
+								options={[
+									{ value: 'ua', label: 'Ukraine' },
+									{ value: 'pl', label: 'Poland' },
+									{ value: 'de', label: 'Germany' },
+								]}
+							/>
+							<DatePicker value={date} onChange={setDate} />
+						</ModalContent>
+					</Modal>
+
+					<Popover>
+						<PopoverTrigger><Button variant="outline">Popover to modal</Button></PopoverTrigger>
+						<PopoverContent>
+							<p className="mb-3 text-sm text-secondary">Open a dialog on top of this popover.</p>
+							<Button size="sm" onClick={() => setModalOpen(true)}>Launch dialog</Button>
+						</PopoverContent>
+					</Popover>
+					<Modal open={modalOpen} onOpenChange={setModalOpen}>
+						<ModalContent>
+							<ModalHeader><ModalTitle>Stacked dialog</ModalTitle><ModalDescription>Must sit above the popover.</ModalDescription></ModalHeader>
+						</ModalContent>
+					</Modal>
+
+					<div className="h-14 w-56 overflow-hidden rounded-box ui-border border-line bg-surface p-2">
+						<ThemeSwitcher showUiStyles />
+					</div>
+				</div>
+			</ThemeProvider>
+		);
+	},
 };

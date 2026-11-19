@@ -94,13 +94,13 @@ export const AccordionTrigger = ({ value, children, className }: { value?: strin
 			aria-controls={`${ctx.baseId}-content-${item}`}
 			onClick={() => ctx.toggleItem(item)}
 			className={cn(
-				'ui-label flex items-center justify-between gap-4 w-full px-6 py-4 text-start text-sm text-page-text',
-				'hover:bg-hover transition-colors duration-300 cursor-pointer outline-none focus-visible:bg-hover',
+				'ui-label flex items-center justify-between gap-4 w-full px-5 py-3.5 text-start text-sm text-page-text',
+				'hover:bg-hover transition-colors duration-150 cursor-pointer outline-none focus-visible:bg-hover',
 				className,
 			)}
 		>
 			{children}
-			<ChevronDownIcon className={cn('size-5 shrink-0 text-action transition-transform duration-300', open && 'rotate-180')} />
+			<ChevronDownIcon className={cn('size-4 shrink-0 text-muted transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]', open && 'rotate-180 text-page-text')} />
 		</button>
 	);
 };
@@ -119,12 +119,12 @@ export const AccordionContent = ({ value, children, className }: { value?: strin
 			aria-hidden={!open || undefined}
 			{...(open ? {} : { inert: '' })}
 			className={cn(
-				'grid transition-[grid-template-rows,opacity,visibility] duration-200 ease-out motion-reduce:transition-none',
+				'grid transition-[grid-template-rows,opacity,visibility] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none',
 				open ? 'grid-rows-[1fr] opacity-100 visible' : 'grid-rows-[0fr] opacity-0 invisible',
 			)}
 		>
 			<div className="min-h-0 overflow-hidden">
-				<div className={cn('px-6 pb-5 text-page-text/80 text-sm leading-relaxed', className)}>{children}</div>
+				<div className={cn('px-5 pb-4 text-secondary text-sm leading-relaxed', className)}>{children}</div>
 			</div>
 		</div>
 	);

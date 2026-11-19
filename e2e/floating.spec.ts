@@ -84,6 +84,10 @@ test.describe('ContextMenu / HoverCard', () => {
 		await expect(item).toBeHidden();
 		await area.click({ button: 'right' });
 		await expect(item).toBeVisible();
+		const firstBox = await page.getByRole('menu').boundingBox();
+		// Right-clicking a second point while already open repositions the menu cleanly
+		await area.click({ button: 'right', position: { x: 160, y: 50 } });
+		await expect.poll(async () => (await page.getByRole('menu').boundingBox())?.x).not.toBe(firstBox?.x);
 		await page.mouse.click(900, 600);
 		await expect(item).toBeHidden();
 		await area.click({ button: 'right' });
@@ -302,6 +306,57 @@ test.describe('Nested layers', () => {
 		await inner.locator('button:enabled').filter({ hasText: /^2[0-7]$/ }).first().click();
 		await expect(page.getByRole('dialog')).toHaveCount(1);
 		await expect(parent).toBeVisible();
+	});
+
+	test('Escape closes Select and DatePicker inside Modal without closing the Modal', async ({ page }) => {
+		await story(page, 'overlays-overview--nested-stacking');
+		await page.getByRole('button', { name: 'Modal with pickers' }).click();
+		const modal = page.getByRole('dialog', { name: 'Schedule' });
+		await expect(modal).toBeVisible();
+
+		// Open Select inside modal, press Escape -> only Select closes
+		await modal.getByRole('combobox').click();
+		const listbox = page.getByRole('listbox');
+		await expect(listbox).toBeVisible();
+		await page.keyboard.press('Escape');
+		await expect(listbox).toBeHidden();
+		await expect(modal).toBeVisible();
+
+		// Open DatePicker inside modal, press Escape -> only DatePicker closes
+		await modal.locator('button[aria-haspopup="dialog"]').click();
+		await expect(page.getByRole('dialog')).toHaveCount(2);
+		await page.keyboard.press('Escape');
+		await expect(page.getByRole('dialog')).toHaveCount(1);
+		await expect(modal).toBeVisible();
+
+		// Next Escape closes the modal itself
+		await page.keyboard.press('Escape');
+		await expect(modal).toBeHidden();
+	});
+
+	test('Dialog opened from Popover gets a strictly higher z-index than the Popover', async ({ page }) => {
+		await story(page, 'overlays-overview--nested-stacking');
+		await page.getByRole('button', { name: 'Popover to modal' }).click();
+		const pop = page.getByRole('dialog').first();
+		await expect(pop).toBeVisible();
+		await pop.getByRole('button', { name: 'Launch dialog' }).click();
+		const dlg = page.getByRole('dialog', { name: 'Stacked dialog' });
+		await expect(dlg).toBeVisible();
+		const popZ = await pop.evaluate((el) => Number(getComputedStyle(el).zIndex));
+		const dlgZ = await dlg.evaluate((el) => Number(getComputedStyle(el.closest('[data-pk-layer]')!).zIndex));
+		expect(dlgZ).toBeGreaterThan(popZ);
+	});
+
+	test('ThemeSwitcher inside overflow-hidden container portals out and stays visible in viewport', async ({ page }) => {
+		await story(page, 'overlays-overview--nested-stacking');
+		const trigger = page.getByRole('button', { name: /White|Theme/i });
+		await trigger.click();
+		const listbox = page.getByRole('listbox', { name: 'Theme' });
+		await expect(listbox).toBeVisible();
+		await expectInViewport(page, listbox);
+		// Must be rendered in document.body portal, not trapped inside the overflow-hidden wrapper
+		const inBody = await listbox.evaluate((el) => el.parentElement?.parentElement === document.body || el.parentElement === document.body);
+		expect(inBody).toBe(true);
 	});
 });
 

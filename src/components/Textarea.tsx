@@ -7,7 +7,7 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, invalid, ...props }, ref) => (
-	<textarea ref={ref} aria-invalid={invalid || props['aria-invalid']} className={cn(fieldStyles, 'px-4 py-2.5 min-h-24 resize-y', className)} {...props} />
+	<textarea ref={ref} aria-invalid={invalid || props['aria-invalid']} className={cn(fieldStyles, 'h-auto px-(--ui-field-px) py-(--ui-field-py) min-h-24 resize-y', className)} {...props} />
 ));
 
 Textarea.displayName = 'Textarea';

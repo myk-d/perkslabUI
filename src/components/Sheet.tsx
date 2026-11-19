@@ -39,11 +39,12 @@ export const SheetContent = ({ children, className, side, position, showCloseBut
 	return (
 		<DialogSurfacePrimitive
 			part="SheetContent"
-			wrapperClassName={cn('fixed inset-0 z-[100]', s.wrapper)}
-			panelClassName={cn('relative overflow-y-auto bg-surface text-page-text shadow-pop p-6 flex flex-col gap-6 border-line outline-none', s.panel, className)}
+			wrapperClassName={cn('fixed inset-0', s.wrapper)}
+			panelClassName={cn('relative overflow-y-auto bg-elevated text-page-text shadow-pop p-6 flex flex-col gap-6 border-line outline-none pk-scrollbar', s.panel, className)}
 			showCloseButton={showCloseButton}
 			closeOnBackdrop={closeOnBackdrop}
 			closeLabel={closeLabel}
+			exitMs={180}
 			panelProps={{ ...panelProps, ...({ 'data-side': resolved } as object) }}
 		>
 			{children}

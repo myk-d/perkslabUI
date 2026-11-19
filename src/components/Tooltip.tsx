@@ -1,14 +1,15 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { Portal } from '../lib/Portal';
 import { cn } from '../lib/cn';
-import { type Align, useAnchoredPosition } from '../lib/dom';
+import { type Align, type Placement, useAnchoredPosition } from '../lib/dom';
+import { useLayer } from '../lib/layers';
 import { presenceAttrs, usePresence } from '../lib/presence';
-
 
 export interface TooltipProps {
 	content: React.ReactNode;
 	children: React.ReactElement<React.HTMLAttributes<HTMLElement>>;
 	align?: Align;
+	placement?: Placement;
 	/** Hover delay in ms. */
 	delay?: number;
 	className?: string;
@@ -18,14 +19,15 @@ export interface TooltipProps {
  * Hover/focus on desktop, tap-to-toggle on touch (a native `title` never fires on touch devices).
  * The bubble is portalled with fixed positioning, so it floats above `overflow-hidden` ancestors.
  */
-export const Tooltip = ({ content, children, align = 'center', delay = 100, className }: TooltipProps) => {
+export const Tooltip = ({ content, children, align = 'center', placement = 'top', delay = 100, className }: TooltipProps) => {
 	const [open, setOpen] = useState(false);
 	const anchorRef = useRef<HTMLSpanElement>(null);
 	const bubbleRef = useRef<HTMLSpanElement>(null);
 	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 	const id = useId();
-	const { mounted, state } = usePresence(open);
-	const style = useAnchoredPosition(anchorRef, bubbleRef, { open: mounted, align, placement: 'top', gap: 8 });
+	const { zIndex } = useLayer(open, 'tooltip');
+	const { mounted, state } = usePresence(open, 140);
+	const { style, side, align: resolvedAlign } = useAnchoredPosition(anchorRef, bubbleRef, { open: mounted, align, placement, gap: 8 });
 
 	const show = () => {
 		clearTimeout(timer.current);
@@ -63,13 +65,20 @@ export const Tooltip = ({ content, children, align = 'center', delay = 100, clas
 				},
 			})}
 			{mounted && (
-				<Portal>
+				<Portal anchorRef={anchorRef}>
 					<span
 						ref={bubbleRef}
 						id={id}
 						role="tooltip"
-						style={style}
-						className={cn('z-[300] pointer-events-none max-w-xs rounded-item bg-page-text px-3 py-1.5 text-xs font-medium text-page-bg shadow-pop', state === 'open' ? 'animate-pk-fade-in' : 'animate-pk-fade-out', className)}
+						data-pk-layer=""
+						data-side={side}
+						data-align={resolvedAlign}
+						style={{ ...style, zIndex }}
+						className={cn(
+							'pointer-events-none max-w-xs rounded-item bg-page-text px-2.5 py-1.5 text-xs font-medium text-page-bg shadow-pop',
+							state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out',
+							className,
+						)}
 						{...presenceAttrs(state)}
 					>
 						{content}

@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useId, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useId, useRef } from 'react';
 import { Portal } from '../lib/Portal';
 import { cn } from '../lib/cn';
-import { type Align, useAnchoredPosition, useClickOutside, useIsomorphicLayoutEffect } from '../lib/dom';
+import { type Align, useAnchoredPosition, useClickOutside } from '../lib/dom';
 import { CheckIcon, ChevronRightIcon } from '../lib/icons';
+import { useLayer } from '../lib/layers';
 import { presenceAttrs, usePresence } from '../lib/presence';
 import { useControllableState } from '../lib/useControllableState';
 
@@ -132,11 +133,12 @@ export const MenubarTrigger = ({ className, onClick, onKeyDown, onMouseEnter, ..
 	);
 };
 
-export const MenubarContent = ({ align = 'start', className, children, onKeyDown, ...props }: React.HTMLAttributes<HTMLDivElement> & { align?: Align }) => {
+export const MenubarContent = ({ align = 'start', className, children, onKeyDown, style: userStyle, ...props }: React.HTMLAttributes<HTMLDivElement> & { align?: Align }) => {
 	const { setOpenId, barRef, focusFirst } = useBar();
 	const { open, triggerRef, contentRef, contentId } = useMenu();
-	const { mounted, state } = usePresence(open);
-	const style = useAnchoredPosition(triggerRef, contentRef, { open: mounted, align, gap: 6 });
+	const { zIndex } = useLayer(open, 'floating');
+	const { mounted, state } = usePresence(open, 140);
+	const { style, side, align: resolvedAlign } = useAnchoredPosition(triggerRef, contentRef, { open: mounted, align, gap: 6 });
 	useClickOutside([triggerRef, contentRef], () => setOpenId(null), open);
 
 	useEffect(() => {
@@ -176,17 +178,23 @@ export const MenubarContent = ({ align = 'start', className, children, onKeyDown
 
 	if (!mounted) return null;
 	return (
-		<Portal>
+		<Portal anchorRef={triggerRef}>
 			<div
 				ref={contentRef}
 				id={contentId}
 				data-pk-layer=""
+				data-side={side}
+				data-align={resolvedAlign}
 				role="menu"
 				aria-orientation="vertical"
 				tabIndex={-1}
-				style={style}
+				style={{ ...style, zIndex, ...userStyle }}
 				onKeyDown={handleKey}
-				className={cn('z-[200] min-w-48 overflow-y-auto ui-border border-line rounded-box bg-surface p-1 text-page-text shadow-pop outline-none', state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none', className)}
+				className={cn(
+					'min-w-48 overflow-y-auto ui-border border-line rounded-pop bg-elevated p-1.5 text-page-text shadow-pop outline-none pk-scrollbar',
+					state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none',
+					className,
+				)}
 				{...presenceAttrs(state)}
 				{...props}
 			>
@@ -197,7 +205,7 @@ export const MenubarContent = ({ align = 'start', className, children, onKeyDown
 };
 
 const itemClasses =
-	'relative flex w-full cursor-pointer items-center gap-2 rounded-item px-3 py-2 text-start text-sm outline-none transition-colors select-none hover:bg-hover focus-visible:bg-hover focus:bg-hover disabled:pointer-events-none disabled:opacity-40';
+	'relative flex w-full cursor-pointer items-center gap-2 rounded-item px-2.5 py-1.5 text-start text-sm outline-none transition-colors duration-150 select-none hover:bg-hover focus-visible:bg-hover focus:bg-hover disabled:pointer-events-none disabled:opacity-40';
 
 export interface MenubarItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	destructive?: boolean;
@@ -333,11 +341,13 @@ export const MenubarLabel = ({ className, inset, ...props }: React.HTMLAttribute
 	<div className={cn('ui-label px-3 py-1.5 text-[11px] text-muted', inset && 'ps-8', className)} {...props} />
 );
 
-export const MenubarSeparator = ({ className }: { className?: string }) => <div role="separator" className={cn('my-1 h-px bg-line/40', className)} />;
+export const MenubarSeparator = ({ className }: { className?: string }) => <div role="separator" className={cn('my-1.5 h-px bg-line-subtle', className)} />;
 
 interface SubContextValue {
 	open: boolean;
 	setOpen: (open: boolean) => void;
+	scheduleClose: () => void;
+	cancelClose: () => void;
 	triggerRef: React.RefObject<HTMLButtonElement>;
 	contentRef: React.RefObject<HTMLDivElement>;
 	contentId: string;
@@ -354,12 +364,21 @@ export const MenubarSub = ({ children, open, defaultOpen = false, onOpenChange }
 	const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const contentRef = useRef<HTMLDivElement>(null);
+	const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 	const contentId = useId();
-	return <SubContext.Provider value={{ open: isOpen, setOpen, triggerRef, contentRef, contentId }}>{children}</SubContext.Provider>;
+	useEffect(() => () => clearTimeout(closeTimer.current), []);
+
+	const cancelClose = () => clearTimeout(closeTimer.current);
+	const scheduleClose = () => {
+		clearTimeout(closeTimer.current);
+		closeTimer.current = setTimeout(() => setOpen(false), 120);
+	};
+
+	return <SubContext.Provider value={{ open: isOpen, setOpen, scheduleClose, cancelClose, triggerRef, contentRef, contentId }}>{children}</SubContext.Provider>;
 };
 
-export const MenubarSubTrigger = ({ className, children, onKeyDown, onMouseEnter, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
-	const { open, setOpen, triggerRef, contentRef, contentId } = useSub();
+export const MenubarSubTrigger = ({ className, children, onKeyDown, onMouseEnter, onMouseLeave, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+	const { open, setOpen, scheduleClose, cancelClose, triggerRef, contentRef, contentId } = useSub();
 	return (
 		<button
 			ref={triggerRef}
@@ -369,16 +388,25 @@ export const MenubarSubTrigger = ({ className, children, onKeyDown, onMouseEnter
 			aria-expanded={open}
 			aria-controls={open ? contentId : undefined}
 			data-state={open ? 'open' : 'closed'}
-			onClick={() => setOpen(true)}
+			onClick={() => {
+				cancelClose();
+				setOpen(true);
+			}}
 			onMouseEnter={(e) => {
 				onMouseEnter?.(e);
+				cancelClose();
 				setOpen(true);
+			}}
+			onMouseLeave={(e) => {
+				onMouseLeave?.(e);
+				scheduleClose();
 			}}
 			onKeyDown={(e) => {
 				onKeyDown?.(e);
 				if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();
 					e.stopPropagation();
+					cancelClose();
 					setOpen(true);
 					requestAnimationFrame(() => contentRef.current?.querySelector<HTMLElement>(ITEM_SELECTOR)?.focus());
 				}
@@ -387,38 +415,37 @@ export const MenubarSubTrigger = ({ className, children, onKeyDown, onMouseEnter
 			{...props}
 		>
 			{children}
-			<ChevronRightIcon className="ms-auto size-4" />
+			<ChevronRightIcon className="ms-auto size-4 text-muted" />
 		</button>
 	);
 };
 
-export const MenubarSubContent = ({ className, children, onKeyDown, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-	const { open, setOpen, triggerRef, contentRef, contentId } = useSub();
-	const { mounted, state } = usePresence(open);
-	const [pos, setPos] = useState<React.CSSProperties>({ position: 'fixed', top: 0, left: 0, visibility: 'hidden' });
-
-	useIsomorphicLayoutEffect(() => {
-		if (!open) return;
-		const a = triggerRef.current?.getBoundingClientRect();
-		const f = contentRef.current?.getBoundingClientRect();
-		if (!a || !f) return;
-		const flip = a.right + f.width + 8 > window.innerWidth;
-		const left = flip ? Math.max(8, a.left - f.width - 4) : a.right + 4;
-		const top = Math.max(8, Math.min(a.top - 4, window.innerHeight - f.height - 8));
-		setPos({ position: 'fixed', top, left, visibility: 'visible' });
-	}, [open, triggerRef, contentRef]);
+export const MenubarSubContent = ({ className, children, onKeyDown, onMouseEnter, onMouseLeave, style: userStyle, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+	const { open, setOpen, scheduleClose, cancelClose, triggerRef, contentRef, contentId } = useSub();
+	const { zIndex } = useLayer(open, 'floating');
+	const { mounted, state } = usePresence(open, 140);
+	const { style, side, align } = useAnchoredPosition(triggerRef, contentRef, { open: mounted, placement: 'right', align: 'start', gap: 4 });
 
 	if (!mounted) return null;
 	return (
-		<Portal>
+		<Portal anchorRef={triggerRef}>
 			<div
 				ref={contentRef}
 				id={contentId}
 				data-pk-layer=""
+				data-side={side}
+				data-align={align}
 				role="menu"
 				aria-orientation="vertical"
-				style={pos}
-				onMouseLeave={() => setOpen(false)}
+				style={{ ...style, zIndex, ...userStyle }}
+				onMouseEnter={(e) => {
+					onMouseEnter?.(e);
+					cancelClose();
+				}}
+				onMouseLeave={(e) => {
+					onMouseLeave?.(e);
+					scheduleClose();
+				}}
 				onKeyDown={(e) => {
 					onKeyDown?.(e);
 					const items = Array.from(contentRef.current?.querySelectorAll<HTMLElement>(ITEM_SELECTOR) ?? []).filter((el) => el.closest('[role="menu"]') === contentRef.current);
@@ -437,7 +464,11 @@ export const MenubarSubContent = ({ className, children, onKeyDown, ...props }: 
 						triggerRef.current?.focus();
 					}
 				}}
-				className={cn('z-[210] min-w-44 overflow-y-auto ui-border border-line rounded-box bg-surface p-1 text-page-text shadow-pop outline-none', state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none', className)}
+				className={cn(
+					'min-w-44 overflow-y-auto ui-border border-line rounded-pop bg-elevated p-1.5 text-page-text shadow-pop outline-none pk-scrollbar',
+					state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none',
+					className,
+				)}
 				{...presenceAttrs(state)}
 				{...props}
 			>

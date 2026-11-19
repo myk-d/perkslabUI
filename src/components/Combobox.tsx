@@ -1,8 +1,9 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { Portal } from '../lib/Portal';
 import { cn } from '../lib/cn';
-import { useAnchoredPosition, useClickOutside } from '../lib/dom';
+import { useAnchoredPosition, useClickOutside, useEscape } from '../lib/dom';
 import { CheckIcon, ChevronDownIcon, CloseIcon } from '../lib/icons';
+import { useLayer } from '../lib/layers';
 import { presenceAttrs, usePresence } from '../lib/presence';
 import { useControllableState } from '../lib/useControllableState';
 import { fieldStyles } from './Input';
@@ -36,8 +37,9 @@ export const Combobox = ({ options, value, defaultValue = null, onChange, placeh
 	const wrapRef = useRef<HTMLDivElement>(null);
 	const listRef = useRef<HTMLDivElement>(null);
 	const uid = useId();
-	const { mounted, state } = usePresence(open);
-	const style = useAnchoredPosition(wrapRef, listRef, { open: mounted, matchWidth: true, gap: 4 });
+	const { isTop, zIndex } = useLayer(open, 'floating');
+	const { mounted, state } = usePresence(open, 140);
+	const { style, side, align } = useAnchoredPosition(wrapRef, listRef, { open: mounted, matchWidth: true, gap: 6 });
 
 	const q = text.trim().toLowerCase();
 	const filtered = q ? options.filter((o) => o.label.toLowerCase().includes(q)) : options;
@@ -50,6 +52,7 @@ export const Combobox = ({ options, value, defaultValue = null, onChange, placeh
 		setText('');
 	};
 	useClickOutside([wrapRef, listRef], close, open);
+	useEscape(() => isTop() && close(), open);
 	useEffect(() => {
 		if (open) document.getElementById(`${uid}-${idx}`)?.scrollIntoView({ block: 'nearest' });
 	}, [open, idx, uid]);
@@ -95,28 +98,42 @@ export const Combobox = ({ options, value, defaultValue = null, onChange, placeh
 					} else if (e.key === 'Enter' && open) {
 						e.preventDefault();
 						commit(idx);
-					} else if (e.key === 'Escape') close();
-					else if (e.key === 'Tab') close();
+					} else if (e.key === 'Escape' && open) {
+						e.preventDefault();
+					} else if (e.key === 'Tab') close();
 				}}
-				className={cn(fieldStyles, 'px-(--ui-field-px) py-(--ui-field-py) pe-16', !open && current && 'placeholder:text-page-text')}
+				className={cn(fieldStyles, 'px-(--ui-field-px) pe-14', !open && current && 'placeholder:text-page-text')}
 			/>
 			<div className="absolute end-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-muted">
 				{clearable && current && !disabled && (
-					<button type="button" aria-label="Clear" onClick={() => setSelected(null)} className="cursor-pointer rounded-item p-0.5 hover:text-page-text outline-none focus-visible:ring-2 focus-visible:ring-brand">
+					<button type="button" aria-label="Clear" onClick={() => setSelected(null)} className="cursor-pointer rounded-item p-0.5 hover:text-page-text transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-brand">
 						<CloseIcon className="size-4" />
 					</button>
 				)}
-				<ChevronDownIcon className={cn('pointer-events-none size-4 transition-transform', open && 'rotate-180')} />
+				<ChevronDownIcon className={cn('pointer-events-none size-4 transition-transform duration-200 ease-out', open && 'rotate-180 text-page-text')} />
 			</div>
 			{name && <input type="hidden" name={name} value={selected ?? ''} />}
 
 			{mounted && (
-				<Portal>
-					<div ref={listRef} data-pk-layer="" id={`${uid}-list`} role="listbox" style={style} {...presenceAttrs(state)} className={cn('z-[200] overflow-y-auto p-1 ui-border border-line rounded-box bg-surface text-page-text shadow-pop pk-scrollbar', state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none')}>
+				<Portal anchorRef={wrapRef}>
+					<div
+						ref={listRef}
+						data-pk-layer=""
+						data-side={side}
+						data-align={align}
+						id={`${uid}-list`}
+						role="listbox"
+						style={{ ...style, zIndex }}
+						{...presenceAttrs(state)}
+						className={cn(
+							'overflow-y-auto p-1.5 ui-border border-line rounded-pop bg-elevated text-page-text shadow-pop pk-scrollbar',
+							state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none',
+						)}
+					>
 						{rows.length === 0 && <div className="px-3 py-6 text-center text-sm text-muted">{emptyText}</div>}
 						{rows.map((row, i) =>
 							row.kind === 'create' ? (
-								<div key="create" id={`${uid}-${i}`} role="option" aria-selected={false} onMouseDown={(e) => e.preventDefault()} onClick={() => commit(i)} onMouseEnter={() => setActive(i)} className={cn('cursor-pointer rounded-item px-3 py-2 text-sm text-action', i === idx && 'bg-hover')}>
+								<div key="create" id={`${uid}-${i}`} role="option" aria-selected={false} onMouseDown={(e) => e.preventDefault()} onClick={() => commit(i)} onMouseEnter={() => setActive(i)} className={cn('cursor-pointer rounded-item px-2.5 py-1.5 text-sm font-medium text-brand transition-colors duration-150', i === idx && 'bg-hover')}>
 									{createLabel(text.trim())}
 								</div>
 							) : (
@@ -129,7 +146,12 @@ export const Combobox = ({ options, value, defaultValue = null, onChange, placeh
 									onMouseDown={(e) => e.preventDefault()}
 									onClick={() => commit(i)}
 									onMouseEnter={() => !row.o.disabled && setActive(i)}
-									className={cn('flex cursor-pointer items-center justify-between gap-2 rounded-item px-3 py-2 text-sm', i === idx && 'bg-hover', row.o.value === selected && 'font-bold text-action', row.o.disabled && 'cursor-not-allowed opacity-40')}
+									className={cn(
+										'flex cursor-pointer items-center justify-between gap-2 rounded-item px-2.5 py-1.5 text-sm transition-colors duration-150',
+										i === idx && 'bg-hover',
+										row.o.value === selected && 'font-semibold text-page-text',
+										row.o.disabled && 'cursor-not-allowed opacity-40',
+									)}
 								>
 									<span className="truncate">{row.o.label}</span>
 									{row.o.value === selected && <CheckIcon className="size-4 shrink-0 text-brand" />}

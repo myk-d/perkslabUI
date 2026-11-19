@@ -4,15 +4,18 @@ import { cn } from '../lib/cn';
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** `sm` tightens the padding and gaps (shadcn parity). */
 	size?: 'default' | 'sm';
+	/** Adds subtle hover border elevation for clickable / bento cards. */
+	interactive?: boolean;
 }
 
-export const Card = ({ className, children, size = 'default', ...props }: CardProps) => (
+export const Card = ({ className, children, size = 'default', interactive = false, ...props }: CardProps) => (
 	<div
 		data-slot="card"
 		data-size={size}
 		className={cn(
-			'group/card bg-surface text-page-text ui-border rounded-box flex w-full flex-col shadow-box transition-shadow duration-300',
+			'group/card bg-surface text-page-text ui-border border-line rounded-box flex w-full flex-col shadow-box transition-[border-color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]',
 			size === 'sm' ? 'gap-3 p-4 [--card-spacing:1rem]' : 'gap-4 p-6 [--card-spacing:1.5rem]',
+			interactive && 'hover:border-line-strong hover:shadow-[var(--ui-shadow-hover)] cursor-pointer',
 			className,
 		)}
 		{...props}
@@ -34,7 +37,7 @@ export const CardTitle = ({ className, children, ...props }: React.HTMLAttribute
 );
 
 export const CardDescription = ({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-	<p className={cn('text-sm text-page-text/60 leading-relaxed', className)} {...props}>
+	<p className={cn('text-sm text-secondary leading-relaxed', className)} {...props}>
 		{children}
 	</p>
 );
@@ -57,15 +60,15 @@ export const CardFooter = ({ className, children, ...props }: React.HTMLAttribut
 );
 
 export const CardImageContainer = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-	<div className={cn('-mx-(--card-spacing) -mt-(--card-spacing) mb-2 overflow-hidden rounded-t-box border-b border-line', className)} {...props}>
+	<div className={cn('-mx-(--card-spacing) -mt-(--card-spacing) mb-2 overflow-hidden rounded-t-box border-b border-line-subtle', className)} {...props}>
 		{children}
 	</div>
 );
 
 export const CardImage = ({ className, src, alt = '', ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
-	<img src={src} alt={alt} className={cn('w-full h-48 object-cover transition-transform duration-500 hover:scale-105', className)} {...props} />
+	<img src={src} alt={alt} className={cn('w-full h-48 object-cover transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.04]', className)} {...props} />
 );
 
 export const CardImagePlaceholder = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-	<div aria-hidden="true" className={cn('w-full h-48 bg-page-text/10 animate-pulse', className)} {...props} />
+	<div aria-hidden="true" className={cn('w-full h-48 pk-skeleton', className)} {...props} />
 );

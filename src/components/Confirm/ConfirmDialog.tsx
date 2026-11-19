@@ -3,6 +3,7 @@ import { ConfirmRequest } from '../../helpers/types/confirm';
 import { Portal } from '../../lib/Portal';
 import { cn } from '../../lib/cn';
 import { useEscape, useFocusTrap, useScrollLock } from '../../lib/dom';
+import { useLayer } from '../../lib/layers';
 import { Button } from '../Button';
 
 interface ConfirmDialogProps {
@@ -15,14 +16,15 @@ interface ConfirmDialogProps {
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ request, closing = false, onConfirm, onCancel }) => {
 	const panelRef = useRef<HTMLDivElement>(null);
+	const { isTop, zIndex } = useLayer(!closing, 'overlay');
 	useScrollLock(!closing);
-	useEscape(onCancel, !closing);
+	useEscape(() => isTop() && onCancel(), !closing);
 	useFocusTrap(panelRef, !closing);
 
 	return (
 		<Portal>
-			<div className={cn('fixed inset-0 z-[9999] flex items-center justify-center p-4', closing && 'pointer-events-none')} {...(closing ? { 'data-state': 'closed', 'aria-hidden': true, inert: '' } : { 'data-state': 'open' })}>
-				<div className={cn('absolute inset-0 bg-page-text/40 backdrop-blur-sm', closing ? 'animate-pk-fade-out' : 'animate-pk-fade-in')} onClick={onCancel} aria-hidden="true" />
+			<div data-pk-layer="" style={{ zIndex }} className={cn('fixed inset-0 flex items-center justify-center p-4', closing && 'pointer-events-none')} {...(closing ? { 'data-state': 'closed', 'aria-hidden': true, inert: '' } : { 'data-state': 'open' })}>
+				<div className={cn('absolute inset-0 bg-scrim backdrop-blur-[2px]', closing ? 'animate-pk-fade-out' : 'animate-pk-fade-in')} onClick={onCancel} aria-hidden="true" />
 				<div
 					ref={panelRef}
 					role="alertdialog"
@@ -30,17 +32,17 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ request, closing =
 					aria-labelledby={request.title ? `${request.id}-t` : undefined}
 					aria-describedby={`${request.id}-m`}
 					tabIndex={-1}
-					className={cn('relative w-full max-w-sm rounded-box ui-border border-line bg-surface p-6 text-page-text shadow-pop outline-none', closing ? 'animate-pk-slide-down' : 'animate-pk-slide-up')}
+					className={cn('relative w-full max-w-sm rounded-pop ui-border border-line bg-elevated p-6 text-page-text shadow-pop outline-none', closing ? 'animate-pk-slide-down' : 'animate-pk-slide-up')}
 				>
 					{request.title && (
 						<h3 id={`${request.id}-t`} className="ui-heading mb-2 text-lg">
 							{request.title}
 						</h3>
 					)}
-					<p id={`${request.id}-m`} className="mb-6 whitespace-pre-line text-sm text-page-text/70">
+					<p id={`${request.id}-m`} className="mb-6 whitespace-pre-line text-sm text-secondary leading-relaxed">
 						{request.message}
 					</p>
-					<div className="flex justify-end gap-3">
+					<div className="flex justify-end gap-2.5">
 						<Button type="button" variant="outline" size="sm" onClick={onCancel}>
 							{request.cancelLabel || 'Cancel'}
 						</Button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Toast, ToastPosition } from '../../helpers/types/toast';
 import { cn } from '../../lib/cn';
+import { TOAST_Z_INDEX } from '../../lib/layers';
 import { Portal } from '../../lib/Portal';
 import { ToastItem } from './ToastItem';
 
@@ -22,9 +23,14 @@ const positionClasses: Record<ToastPosition, string> = {
 
 export const ToastContainer: React.FC<ContainerProps> = ({ toasts, position, timeout, onClose }) => (
 	<Portal>
-		<div aria-live="polite" aria-relevant="additions" className={cn('fixed z-[9999] flex max-w-[calc(100vw-2.5rem)] flex-col gap-3 pointer-events-none', positionClasses[position])}>
+		<div
+			aria-live="polite"
+			aria-relevant="additions"
+			style={{ zIndex: TOAST_Z_INDEX }}
+			className={cn('fixed flex max-w-[calc(100vw-2.5rem)] flex-col gap-2.5 pointer-events-none', positionClasses[position])}
+		>
 			{toasts.map((toast) => (
-				<ToastItem key={toast.id} toast={toast} onClose={onClose} timeout={toast.duration ?? timeout} />
+				<ToastItem key={toast.id} toast={toast} position={position} onClose={onClose} timeout={toast.duration ?? timeout} />
 			))}
 		</div>
 	</Portal>

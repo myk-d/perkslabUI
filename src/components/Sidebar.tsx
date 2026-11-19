@@ -131,7 +131,7 @@ export const Sidebar = ({ side = 'left', variant = 'sidebar', collapsible = 'off
 			{/* Reserves the space of the fixed panel inside the flex layout. */}
 			<div
 				className={cn(
-					'relative h-svh bg-transparent transition-[width] duration-200 ease-linear w-(--sidebar-width)',
+					'relative h-svh bg-transparent transition-[width] duration-250 ease-[cubic-bezier(0.32,0.72,0,1)] w-(--sidebar-width)',
 					collapsed && collapsible === 'offcanvas' && 'w-0',
 					collapsed && collapsible === 'icon' && (floating ? 'w-[calc(var(--sidebar-width-icon)+1rem)]' : 'w-(--sidebar-width-icon)'),
 					floating && !collapsed && 'w-[calc(var(--sidebar-width)+1rem)]',
@@ -139,7 +139,7 @@ export const Sidebar = ({ side = 'left', variant = 'sidebar', collapsible = 'off
 			/>
 			<div
 				className={cn(
-					'fixed inset-y-0 z-30 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
+					'fixed inset-y-0 z-30 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-250 ease-[cubic-bezier(0.32,0.72,0,1)] md:flex',
 					side === 'left' ? 'left-0' : 'right-0',
 					collapsed && collapsible === 'offcanvas' && (side === 'left' ? 'left-[calc(var(--sidebar-width)*-1)]' : 'right-[calc(var(--sidebar-width)*-1)]'),
 					collapsed && collapsible === 'icon' && (floating ? 'w-[calc(var(--sidebar-width-icon)+1rem)]' : 'w-(--sidebar-width-icon)'),

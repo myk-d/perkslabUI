@@ -1,8 +1,9 @@
 import React, { forwardRef, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { Portal } from '../lib/Portal';
 import { cn } from '../lib/cn';
-import { useAnchoredPosition, useClickOutside } from '../lib/dom';
+import { useAnchoredPosition, useClickOutside, useEscape } from '../lib/dom';
 import { CheckIcon, ChevronDownIcon } from '../lib/icons';
+import { useLayer } from '../lib/layers';
 import { presenceAttrs, usePresence } from '../lib/presence';
 import { useControllableState } from '../lib/useControllableState';
 import { fieldStyles } from './Input';
@@ -60,8 +61,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 		const query = search.trim().toLowerCase();
 		const visible = searchable && query ? options.filter((o) => o.label.toLowerCase().includes(query)) : options;
 		const current = options.find((o) => o.value === selected);
-		const { mounted, state } = usePresence(open);
-		const style = useAnchoredPosition(triggerRef, listRef, { open: mounted, matchWidth: true, gap: 4 });
+		const { isTop, zIndex } = useLayer(open, 'floating');
+		const { mounted, state } = usePresence(open, 140);
+		const { style, side, align } = useAnchoredPosition(triggerRef, listRef, { open: mounted, matchWidth: true, gap: 6 });
 
 		const close = (refocus = true) => {
 			setOpen(false);
@@ -81,6 +83,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 		};
 
 		useClickOutside([triggerRef, listRef], () => close(false), open);
+		useEscape(() => isTop() && close(), open);
 
 		useEffect(() => {
 			if (open && searchable) searchRef.current?.focus();
@@ -133,8 +136,6 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 				case 'Escape':
 					if (open) {
 						e.preventDefault();
-						e.stopPropagation();
-						close();
 					}
 					break;
 				case 'Tab':
@@ -151,7 +152,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 		return (
 			<div className={cn('flex flex-col gap-1.5 w-full', className)} onKeyDown={onKeyDown}>
 				{label && (
-					<label htmlFor={id ?? uid} className="ui-label text-xs text-page-text/70">
+					<label htmlFor={id ?? uid} className="ui-label text-xs text-secondary">
 						{label}
 					</label>
 				)}
@@ -160,6 +161,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 					id={id ?? uid}
 					type="button"
 					role="combobox"
+					data-state={open ? 'open' : 'closed'}
 					aria-haspopup="listbox"
 					aria-expanded={open}
 					aria-controls={open ? listboxId : undefined}
@@ -167,24 +169,33 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 					aria-invalid={invalid || undefined}
 					disabled={disabled}
 					onClick={() => (open ? close() : openList())}
-					className={cn(fieldStyles, 'flex items-center justify-between gap-2 px-(--ui-field-px) py-(--ui-field-py) text-start cursor-pointer')}
+					className={cn(
+						fieldStyles,
+						'flex items-center justify-between gap-2 px-(--ui-field-px) text-start cursor-pointer',
+						open && 'border-brand ring-3 ring-brand/15',
+					)}
 				>
 					<span className={cn('truncate', !current && 'text-muted')}>{current?.label ?? placeholder}</span>
-					<ChevronDownIcon className={cn('size-4 shrink-0 text-muted transition-transform duration-200', open && 'rotate-180')} />
+					<ChevronDownIcon className={cn('size-4 shrink-0 text-muted transition-transform duration-200 ease-out', open && 'rotate-180 text-page-text')} />
 				</button>
 				{name && <input type="hidden" name={name} value={selected ?? ''} />}
 
 				{mounted && (
-					<Portal>
+					<Portal anchorRef={triggerRef}>
 						<div
 							data-pk-layer=""
-ref={listRef}
-							style={style}
-							className={cn('z-[200] flex flex-col overflow-hidden ui-border border-line rounded-box bg-surface text-page-text shadow-pop', state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none')}
+							data-side={side}
+							data-align={align}
+							ref={listRef}
+							style={{ ...style, zIndex }}
+							className={cn(
+								'flex flex-col overflow-hidden ui-border border-line rounded-pop bg-elevated text-page-text shadow-pop',
+								state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none',
+							)}
 							{...presenceAttrs(state)}
 						>
 							{searchable && (
-								<div className="p-2 border-b border-line/40">
+								<div className="p-1.5 border-b border-line-subtle">
 									<input
 										ref={searchRef}
 										value={search}
@@ -194,11 +205,11 @@ ref={listRef}
 										}}
 										placeholder={searchPlaceholder}
 										aria-label={searchPlaceholder}
-										className="w-full bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted"
+										className="w-full rounded-item bg-transparent px-2.5 py-1.5 text-sm outline-none placeholder:text-muted"
 									/>
 								</div>
 							)}
-							<div id={listboxId} role="listbox" className="overflow-y-auto p-1 pk-scrollbar">
+							<div id={listboxId} role="listbox" className="overflow-y-auto p-1.5 pk-scrollbar">
 								{visible.length === 0 && <div className="px-3 py-6 text-center text-sm text-muted">{emptyText}</div>}
 								{visible.map((opt, i) => (
 									<div
@@ -211,9 +222,9 @@ ref={listRef}
 										onMouseDown={(e) => e.preventDefault()}
 										onClick={() => commit(opt)}
 										className={cn(
-											'flex items-center justify-between gap-2 rounded-item px-3 py-2 text-sm cursor-pointer',
+											'flex items-center justify-between gap-2 rounded-item px-2.5 py-1.5 text-sm cursor-pointer transition-colors duration-150',
 											i === safeHighlight && 'bg-hover',
-											opt.value === selected && 'font-bold text-action',
+											opt.value === selected && 'font-semibold text-page-text',
 											opt.disabled && 'opacity-40 cursor-not-allowed',
 										)}
 									>

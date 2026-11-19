@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useId, useMemo, useRef } from 'react';
+import React, { createContext, useContext, useId, useMemo, useRef, useState } from 'react';
 import { cn } from '../lib/cn';
+import { useIsomorphicLayoutEffect } from '../lib/dom';
 import { useControllableState } from '../lib/useControllableState';
 
 interface TabsContextValue {
@@ -31,8 +32,37 @@ export const Tabs = ({ value, defaultValue, onValueChange, className, ...props }
 	);
 };
 
-export const TabsList = ({ className, onKeyDown, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+export const TabsList = ({ className, onKeyDown, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+	const ctx = useTabs();
 	const ref = useRef<HTMLDivElement>(null);
+	const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
+	const ready = useRef(false);
+
+	useIsomorphicLayoutEffect(() => {
+		const container = ref.current;
+		if (!container) return;
+		const measure = () => {
+			const active = container.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+			if (!active) {
+				setIndicator(null);
+				return;
+			}
+			const next = { left: active.offsetLeft, width: active.offsetWidth };
+			setIndicator((prev) => (prev && prev.left === next.left && prev.width === next.width ? prev : next));
+		};
+		measure();
+		const frame = requestAnimationFrame(() => {
+			ready.current = true;
+		});
+		if (typeof ResizeObserver === 'undefined') return () => cancelAnimationFrame(frame);
+		const ro = new ResizeObserver(measure);
+		ro.observe(container);
+		return () => {
+			cancelAnimationFrame(frame);
+			ro.disconnect();
+		};
+	}, [ctx.value, children]);
+
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		onKeyDown?.(e);
 		if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
@@ -49,9 +79,21 @@ export const TabsList = ({ className, onKeyDown, ...props }: React.HTMLAttribute
 			ref={ref}
 			role="tablist"
 			onKeyDown={handleKeyDown}
-			className={cn('inline-flex w-fit max-w-full items-center gap-1 overflow-x-auto ui-border border-line rounded-control bg-surface p-1', className)}
+			className={cn('relative inline-flex w-fit max-w-full items-center gap-0.5 overflow-x-auto ui-border border-line-subtle rounded-control bg-subtle p-1', className)}
 			{...props}
-		/>
+		>
+			{indicator && (
+				<span
+					aria-hidden="true"
+					style={{ width: indicator.width, transform: `translate3d(${indicator.left}px, 0, 0)` }}
+					className={cn(
+						'pointer-events-none absolute inset-y-1 left-0 rounded-control bg-brand shadow-box motion-reduce:transition-none',
+						ready.current && 'transition-[transform,width] duration-250 ease-[cubic-bezier(0.16,1,0.3,1)]',
+					)}
+				/>
+			)}
+			{children}
+		</div>
 	);
 };
 
@@ -68,9 +110,9 @@ export const TabsTrigger = ({ value, className, ...props }: React.ButtonHTMLAttr
 			tabIndex={active ? 0 : -1}
 			onClick={() => ctx.setValue(value)}
 			className={cn(
-				'ui-label cursor-pointer whitespace-nowrap rounded-control px-4 py-1.5 text-sm transition-colors outline-none',
+				'ui-label relative z-10 cursor-pointer whitespace-nowrap rounded-control px-3.5 py-1.5 text-sm transition-colors duration-150 outline-none',
 				'focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50 disabled:pointer-events-none',
-				active ? 'bg-brand text-brand-fg' : 'text-page-text hover:bg-hover',
+				active ? 'text-brand-fg' : 'text-secondary hover:text-page-text',
 				className,
 			)}
 			{...props}
@@ -87,7 +129,7 @@ export const TabsContent = ({ value, className, ...props }: React.HTMLAttributes
 			id={`${ctx.baseId}-panel-${value}`}
 			aria-labelledby={`${ctx.baseId}-tab-${value}`}
 			tabIndex={0}
-			className={cn('outline-none animate-pk-fade-in', className)}
+			className={cn('outline-none animate-pk-tab-in', className)}
 			{...props}
 		/>
 	);

@@ -5,6 +5,7 @@ import { Slot } from '../lib/Slot';
 import { cn } from '../lib/cn';
 import { useAnchoredPosition, useClickOutside, useEscape } from '../lib/dom';
 import { ChevronDownIcon } from '../lib/icons';
+import { useLayer } from '../lib/layers';
 import { useControllableState } from '../lib/useControllableState';
 
 const FOCUSABLE = 'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -212,15 +213,17 @@ export const NavigationMenuTrigger = forwardRef<HTMLButtonElement, React.ButtonH
 );
 NavigationMenuTrigger.displayName = 'NavigationMenuTrigger';
 
-export const NavigationMenuContent = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, children, onKeyDown, onPointerEnter, onPointerLeave, ...props }, ref) => {
+export const NavigationMenuContent = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, children, onKeyDown, onPointerEnter, onPointerLeave, style: userStyle, ...props }, ref) => {
 	const menu = useNavigationMenu();
 	const item = useItem();
 	const open = menu.value === item.value;
-	const { mounted, state } = usePresence(open);
-	const style = useAnchoredPosition(item.triggerRef, item.contentRef, { open: mounted, align: 'start', gap: 6 });
+	const { isTop, zIndex } = useLayer(open, 'floating');
+	const { mounted, state } = usePresence(open, 140);
+	const { style, side, align } = useAnchoredPosition(item.triggerRef, item.contentRef, { open: mounted, align: 'start', gap: 6 });
 	const close = () => menu.setValue('');
 	useClickOutside([item.triggerRef, item.contentRef], close, open);
 	useEscape(() => {
+		if (!isTop()) return;
 		close();
 		item.triggerRef.current?.focus();
 	}, open);
@@ -260,15 +263,21 @@ export const NavigationMenuContent = forwardRef<HTMLDivElement, React.HTMLAttrib
 	};
 
 	return (
-		<Portal>
+		<Portal anchorRef={item.triggerRef}>
 			<div
 				ref={setRefs}
 				id={item.contentId}
 				data-pk-layer=""
+				data-side={side}
+				data-align={align}
 				role="group"
 				aria-labelledby={item.triggerId}
-				style={style}
-				className={cn('z-[200] w-max max-w-[calc(100vw-1rem)] overflow-y-auto ui-border border-line rounded-box bg-surface p-3 text-page-text shadow-pop outline-none', state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none', className)}
+				style={{ ...style, zIndex, ...userStyle }}
+				className={cn(
+					'w-max max-w-[calc(100vw-1rem)] overflow-y-auto ui-border border-line rounded-pop bg-elevated p-3 text-page-text shadow-pop outline-none pk-scrollbar',
+					state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none',
+					className,
+				)}
 				{...presenceAttrs(state)}
 				onPointerEnter={(e) => {
 					onPointerEnter?.(e);

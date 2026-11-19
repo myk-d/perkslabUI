@@ -2,6 +2,7 @@ import React, { createContext, useContext, useId, useMemo, useRef } from 'react'
 import { Portal } from '../lib/Portal';
 import { cn } from '../lib/cn';
 import { type Align, type Placement, useAnchoredPosition, useClickOutside, useEscape } from '../lib/dom';
+import { useLayer } from '../lib/layers';
 import { presenceAttrs, usePresence } from '../lib/presence';
 import { withTriggerAria } from '../lib/trigger';
 import { useControllableState } from '../lib/useControllableState';
@@ -42,10 +43,11 @@ export const PopoverTrigger = ({ children, className }: { children: React.ReactN
 	return (
 		<span
 			ref={anchorRef as React.RefObject<HTMLSpanElement>}
+			data-state={open ? 'open' : 'closed'}
 			className={cn('inline-flex', className)}
 			onClick={() => setOpen(!open)}
 		>
-			{withTriggerAria(children, { 'aria-haspopup': 'dialog', 'aria-expanded': open, 'aria-controls': open ? contentId : undefined }, `${contentId}-trigger`)}
+			{withTriggerAria(children, { 'aria-haspopup': 'dialog', 'aria-expanded': open, 'aria-controls': open ? contentId : undefined, 'data-state': open ? 'open' : 'closed' }, `${contentId}-trigger`)}
 		</span>
 	);
 };
@@ -55,23 +57,30 @@ export interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement
 	placement?: Placement;
 }
 
-export const PopoverContent = ({ align = 'start', placement = 'bottom', className, children, ...props }: PopoverContentProps) => {
+export const PopoverContent = ({ align = 'start', placement = 'bottom', className, children, style: userStyle, ...props }: PopoverContentProps) => {
 	const { open, setOpen, anchorRef, contentRef, contentId } = usePopover();
-	const { mounted, state } = usePresence(open);
-	const style = useAnchoredPosition(anchorRef, contentRef, { open: mounted, align, placement });
+	const { isTop, zIndex } = useLayer(open, 'floating');
+	const { mounted, state } = usePresence(open, 140);
+	const { style, side, align: resolvedAlign } = useAnchoredPosition(anchorRef, contentRef, { open: mounted, align, placement, gap: 6 });
 	useClickOutside([anchorRef, contentRef], () => setOpen(false), open);
-	useEscape(() => setOpen(false), open);
+	useEscape(() => isTop() && setOpen(false), open);
 	if (!mounted) return null;
 	return (
-		<Portal>
+		<Portal anchorRef={anchorRef}>
 			<div
 				ref={contentRef}
 				data-pk-layer=""
-id={contentId}
+				data-side={side}
+				data-align={resolvedAlign}
+				id={contentId}
 				role="dialog"
 				aria-labelledby={anchorRef.current?.firstElementChild?.id || undefined}
-				style={style}
-				className={cn('z-[200] w-72 overflow-y-auto ui-border border-line rounded-box bg-surface p-4 text-page-text shadow-pop outline-none', state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none', className)}
+				style={{ ...style, zIndex, ...userStyle }}
+				className={cn(
+					'w-72 overflow-y-auto ui-border border-line rounded-pop bg-elevated p-4 text-page-text shadow-pop outline-none pk-scrollbar',
+					state === 'open' ? 'animate-pk-pop-in' : 'animate-pk-pop-out pointer-events-none',
+					className,
+				)}
 				{...presenceAttrs(state)}
 				{...props}
 			>

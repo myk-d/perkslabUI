@@ -139,7 +139,7 @@ export const DrawerOverlay = ({ className, ...props }: React.HTMLAttributes<HTML
 	const ctx = useDrawer('DrawerOverlay');
 	return (
 		<div
-			className={cn('absolute inset-0 bg-page-text/30 backdrop-blur-sm', ctx.open ? 'animate-pk-fade-in' : 'animate-pk-fade-out', className)}
+			className={cn('absolute inset-0 bg-scrim backdrop-blur-[2px]', ctx.open ? 'animate-pk-fade-in' : 'animate-pk-fade-out', className)}
 			data-state={ctx.open ? 'open' : 'closed'}
 			onClick={ctx.disablePointerDismissal ? undefined : () => ctx.setOpen(false)}
 			aria-hidden="true"
@@ -233,7 +233,7 @@ export const DrawerContent = ({ children, className, side, showSwipeHandle, show
 	const [ax, ay] = AXIS[dir];
 	const sign = vertical ? ay : ax;
 	const panelRef = useRef<HTMLDivElement>(null);
-	const isTop = useLayer(ctx.open);
+	const { isTop, zIndex } = useLayer(ctx.open, 'overlay');
 	const { modal, disablePointerDismissal, snapPoints } = ctx;
 
 	useScrollLock(ctx.open && modal === true);
@@ -383,8 +383,8 @@ export const DrawerContent = ({ children, className, side, showSwipeHandle, show
 	const sizeStyle: React.CSSProperties = snaps ? (vertical ? { height: maxSnap, maxHeight: 'none' } : { width: maxSnap, maxWidth: 'none' }) : {};
 
 	return (
-		<Portal>
-			<div className={cn('fixed inset-0 z-[100]', (modal !== true || closed) && 'pointer-events-none')} {...presenceAttrs(state)}>
+		<Portal anchorRef={ctx.triggerRef}>
+			<div data-pk-layer="" style={{ zIndex }} className={cn('fixed inset-0', (modal !== true || closed) && 'pointer-events-none')} {...presenceAttrs(state)}>
 				{modal === true && <DrawerOverlay />}
 				<div
 					ref={panelRef}
@@ -402,7 +402,7 @@ export const DrawerContent = ({ children, className, side, showSwipeHandle, show
 					data-nested-drawer-open={ctx.nested > 0 ? '' : undefined}
 					style={{ ...sizeStyle, ...style, transform, '--pk-off': `${offset}px`, '--pk-nested': ctx.nested } as React.CSSProperties}
 					className={cn(
-						'pointer-events-auto absolute flex touch-none flex-col gap-4 overflow-y-auto bg-surface p-6 text-page-text shadow-pop outline-none border-line',
+						'pointer-events-auto absolute flex touch-none flex-col gap-4 overflow-y-auto bg-elevated p-6 text-page-text shadow-pop outline-none border-line pk-scrollbar',
 						'transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform motion-reduce:transition-none data-swiping:select-none data-swiping:transition-none',
 						PANEL_CLASS[dir],
 						className,

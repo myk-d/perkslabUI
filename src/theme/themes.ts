@@ -21,8 +21,12 @@ export interface ThemeColors {
 	brandBg?: string;
 	/** Text on top of `brand`. Defaults to `background`. */
 	brandFg?: string;
-	/** Raised surfaces (cards in panel/soft/silk). Derived from background when omitted. */
+	/** Raised surfaces (cards, sidebars, tables). Derived from background when omitted. */
 	panel?: string;
+	/** Floating surfaces (popovers, menus, dialogs, calendars). Derived when omitted. */
+	elevated?: string;
+	/** Soft recessed wells (table headers, tab tracks, subtle pills). Derived when omitted. */
+	subtle?: string;
 	border?: string;
 	muted?: string;
 	danger?: string;
@@ -75,6 +79,8 @@ export const themeCssVars: Record<keyof ThemeColors, string> = {
 	background: '--bg-page',
 	foreground: '--text-main',
 	panel: '--bg-panel',
+	elevated: '--bg-elevated',
+	subtle: '--bg-subtle',
 	border: '--panel-border',
 	muted: '--text-muted',
 	danger: '--c-danger',

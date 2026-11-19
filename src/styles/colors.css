@@ -5,141 +5,240 @@
    `[data-theme]` as well as :root so a theme applied to a nested element resolves against its own values. */
 :root,
 [data-theme] {
-	--brand-fg: var(--bg-page);
-	--bg-panel: color-mix(in srgb, var(--bg-page) 95%, var(--text-main));
-	--panel-border: color-mix(in srgb, var(--bg-page) 82%, var(--text-main));
-	--text-muted: color-mix(in srgb, var(--text-main) 68%, var(--bg-page));
+	--brand-fg: #ffffff;
+	--bg-panel: color-mix(in srgb, #ffffff 85%, var(--bg-page));
+	--bg-elevated: #ffffff;
+	--bg-subtle: color-mix(in srgb, var(--bg-page) 93%, var(--text-main));
+	--bg-scrim: rgb(9 9 11 / 0.42);
+	--panel-border: color-mix(in srgb, var(--bg-page) 84%, var(--text-main));
+	--text-secondary: color-mix(in srgb, var(--text-main) 78%, var(--bg-page));
+	--text-muted: color-mix(in srgb, var(--text-main) 62%, var(--bg-page));
 
 	--c-danger: #dc2626;
+	--c-danger-fg: #ffffff;
 	--c-ok: #15803d;
+	--c-ok-fg: #ffffff;
 	--c-warning: #b45309;
+	--c-warning-fg: #ffffff;
 	--c-info: #2563eb;
+	--c-info-fg: #ffffff;
 }
 
-/* Dark surfaces need lighter status colours to keep their contrast. */
+/* Dark surfaces lift panels/elevated layers above the canvas, use a dark scrim, and pair brighter status hues with high-contrast dark text. */
 [data-theme='dark'],
 [data-theme$='-dark'] {
+	--brand-fg: var(--bg-page);
+	--bg-panel: color-mix(in srgb, var(--bg-page) 93%, #ffffff);
+	--bg-elevated: color-mix(in srgb, var(--bg-page) 87%, #ffffff);
+	--bg-subtle: color-mix(in srgb, var(--bg-page) 89%, #ffffff);
+	--bg-scrim: rgb(0 0 0 / 0.68);
+	--panel-border: color-mix(in srgb, var(--bg-page) 82%, #ffffff);
+	--text-secondary: color-mix(in srgb, var(--text-main) 80%, var(--bg-page));
+	--text-muted: color-mix(in srgb, var(--text-main) 64%, var(--bg-page));
+
 	--c-danger: #f87171;
+	--c-danger-fg: #1f0707;
 	--c-ok: #4ade80;
+	--c-ok-fg: #052e16;
 	--c-warning: #fbbf24;
+	--c-warning-fg: #1c1002;
 	--c-info: #60a5fa;
+	--c-info-fg: #071936;
 }
 
 /* The default (no data-theme) palette equals the 'light' theme. */
 :root {
 	--brand-color: #18181b;
-	--brand-hover: #000000;
-	--brand-bg: #f4f4f5;
-	--bg-page: #fafafa;
-	--text-main: #18181b;
+	--brand-hover: #27272a;
+	--brand-bg: #eef0f3;
+	--brand-fg: #ffffff;
+	--bg-page: #f6f7f8;
+	--text-main: #14171c;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #eef0f3;
+	--panel-border: #e2e5ea;
+	--text-muted: #57606a;
 	color-scheme: light;
 }
 
 [data-theme='light'] {
 	--brand-color: #18181b;
-	--brand-hover: #000000;
-	--brand-bg: #f4f4f5;
-	--bg-page: #fafafa;
-	--text-main: #18181b;
+	--brand-hover: #27272a;
+	--brand-bg: #eef0f3;
+	--brand-fg: #ffffff;
+	--bg-page: #f6f7f8;
+	--text-main: #14171c;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #eef0f3;
+	--panel-border: #e2e5ea;
+	--text-muted: #57606a;
 	color-scheme: light;
 }
 
 [data-theme='dark'] {
 	--brand-color: #ffffff;
-	--brand-hover: #f4f4f5;
-	--brand-bg: #27272a;
-	--bg-page: #16161b;
-	--text-main: #f4f4f5;
+	--brand-hover: #e4e4e7;
+	--brand-bg: #252a35;
+	--brand-fg: #0c0e12;
+	--bg-page: #0c0e12;
+	--text-main: #f3f4f6;
+	--bg-panel: #14171d;
+	--bg-elevated: #1c2029;
+	--bg-subtle: #1f242e;
+	--panel-border: #272c38;
+	--text-muted: #9aa2b1;
 	color-scheme: dark;
 }
 
 [data-theme='blue-light'] {
 	--brand-color: #2563eb;
 	--brand-hover: #1d4ed8;
-	--brand-bg: #dbeafe;
-	--bg-page: #f0f7ff;
-	--text-main: #1e3a8a;
+	--brand-bg: #eff6ff;
+	--brand-fg: #ffffff;
+	--bg-page: #f5f7fa;
+	--text-main: #141b29;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #edf1f7;
+	--panel-border: #dde3ec;
+	--text-muted: #556275;
 	color-scheme: light;
 }
 
 [data-theme='blue-dark'] {
 	--brand-color: #60a5fa;
 	--brand-hover: #93c5fd;
-	--brand-bg: #1e3a8a;
-	--bg-page: #0f172a;
+	--brand-bg: #172554;
+	--brand-fg: #0b1120;
+	--bg-page: #0b1120;
 	--text-main: #f1f5f9;
+	--bg-panel: #111827;
+	--bg-elevated: #192338;
+	--bg-subtle: #1e293b;
+	--panel-border: #243249;
+	--text-muted: #94a3b8;
 	color-scheme: dark;
 }
 
 [data-theme='green-light'] {
-	--brand-color: #16a34a;
-	--brand-hover: #15803d;
-	--brand-bg: #dcfce7;
-	--bg-page: #f0fdf4;
-	--text-main: #14532d;
+	--brand-color: #15803d;
+	--brand-hover: #166534;
+	--brand-bg: #ecfdf3;
+	--brand-fg: #ffffff;
+	--bg-page: #f5f7f6;
+	--text-main: #14201b;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #ecf2ee;
+	--panel-border: #dce4df;
+	--text-muted: #52645c;
 	color-scheme: light;
 }
 
 [data-theme='green-dark'] {
 	--brand-color: #4ade80;
 	--brand-hover: #86efac;
-	--brand-bg: #14532d;
-	--bg-page: #061f10;
-	--text-main: #f0fdf4;
+	--brand-bg: #0f2e1d;
+	--brand-fg: #052e16;
+	--bg-page: #0a120e;
+	--text-main: #eef5f0;
+	--bg-panel: #101b15;
+	--bg-elevated: #16251d;
+	--bg-subtle: #1a2b22;
+	--panel-border: #22382c;
+	--text-muted: #91a89a;
 	color-scheme: dark;
 }
 
 [data-theme='purple-light'] {
-	--brand-color: #9333ea;
-	--brand-hover: #7e22ce;
-	--brand-bg: #f3e8ff;
-	--bg-page: #faf5ff;
-	--text-main: #581c87;
+	--brand-color: #7c3aed;
+	--brand-hover: #6d28d9;
+	--brand-bg: #f5f3ff;
+	--brand-fg: #ffffff;
+	--bg-page: #f7f6f9;
+	--text-main: #1a1625;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #f0eef5;
+	--panel-border: #e4e0ec;
+	--text-muted: #605970;
 	color-scheme: light;
 }
 
 [data-theme='purple-dark'] {
 	--brand-color: #c084fc;
 	--brand-hover: #d8b4fe;
-	--brand-bg: #581c87;
-	--bg-page: #1a1033;
-	--text-main: #faf5ff;
+	--brand-bg: #2e1065;
+	--brand-fg: #150826;
+	--bg-page: #0f0d16;
+	--text-main: #f5f3ff;
+	--bg-panel: #171422;
+	--bg-elevated: #201c2f;
+	--bg-subtle: #252036;
+	--panel-border: #302a45;
+	--text-muted: #a29bb5;
 	color-scheme: dark;
 }
 
 [data-theme='red-light'] {
 	--brand-color: #dc2626;
 	--brand-hover: #b91c1c;
-	--brand-bg: #fee2e2;
-	--bg-page: #fef2f2;
-	--text-main: #7f1d1d;
+	--brand-bg: #fef2f2;
+	--brand-fg: #ffffff;
+	--bg-page: #f8f6f6;
+	--text-main: #1f1515;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #f3eeee;
+	--panel-border: #e8dfdf;
+	--text-muted: #6b5a5a;
 	color-scheme: light;
 }
 
 [data-theme='red-dark'] {
 	--brand-color: #f87171;
 	--brand-hover: #fca5a5;
-	--brand-bg: #7f1d1d;
-	--bg-page: #1a0505;
-	--text-main: #fef2f2;
+	--brand-bg: #450a0a;
+	--brand-fg: #1f0707;
+	--bg-page: #120c0c;
+	--text-main: #faf5f5;
+	--bg-panel: #1b1313;
+	--bg-elevated: #251a1a;
+	--bg-subtle: #2b1e1e;
+	--panel-border: #3b2727;
+	--text-muted: #b09898;
 	color-scheme: dark;
 }
 
 [data-theme='yellow-light'] {
-	--brand-color: #d97706;
-	--brand-hover: #b45309;
-	--brand-bg: #fef3c7;
-	--bg-page: #fffbeb;
-	--text-main: #713f12;
+	--brand-color: #b45309;
+	--brand-hover: #92400e;
+	--brand-bg: #fef9ec;
+	--brand-fg: #ffffff;
+	--bg-page: #f8f7f4;
+	--text-main: #1f1b13;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #f2efe8;
+	--panel-border: #e7e3d8;
+	--text-muted: #6b6252;
 	color-scheme: light;
 }
 
 [data-theme='yellow-dark'] {
 	--brand-color: #fbbf24;
 	--brand-hover: #fcd34d;
-	--brand-bg: #713f12;
-	--bg-page: #1c1505;
-	--text-main: #fffbeb;
+	--brand-bg: #422006;
+	--brand-fg: #1c1002;
+	--bg-page: #12100a;
+	--text-main: #faf7ef;
+	--bg-panel: #1c1810;
+	--bg-elevated: #262116;
+	--bg-subtle: #2c2619;
+	--panel-border: #3d3422;
+	--text-muted: #b0a690;
 	color-scheme: dark;
 }
 
@@ -147,89 +246,127 @@
 	--brand-color: #4f46e5;
 	--brand-hover: #4338ca;
 	--brand-bg: #eef2ff;
-	--bg-page: #ffffff;
-	--text-main: #1e293b;
+	--brand-fg: #ffffff;
+	--bg-page: #f6f7fb;
+	--text-main: #151929;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #edeff6;
+	--panel-border: #e0e4ef;
+	--text-muted: #596178;
 	color-scheme: light;
 }
 
 [data-theme='indigo-dark'] {
 	--brand-color: #818cf8;
 	--brand-hover: #a5b4fc;
-	--brand-bg: #312e81;
-	--bg-page: #0f1020;
-	--text-main: #e0e7ff;
+	--brand-bg: #1e1b4b;
+	--brand-fg: #0c0e1a;
+	--bg-page: #0c0e1a;
+	--text-main: #eef2ff;
+	--bg-panel: #131628;
+	--bg-elevated: #1b2038;
+	--bg-subtle: #202642;
+	--panel-border: #2a3154;
+	--text-muted: #949ec0;
 	color-scheme: dark;
 }
 
 [data-theme='orange-light'] {
-	--brand-color: #e1552f;
-	--brand-hover: #c9431f;
-	--brand-bg: #fdf3ee;
-	--bg-page: #f7f3ec;
-	--text-main: #292524;
+	--brand-color: #d9481f;
+	--brand-hover: #be3b17;
+	--brand-bg: #fdf2ee;
+	--brand-fg: #ffffff;
+	--bg-page: #f7f4ef;
+	--text-main: #221d1a;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #efeae2;
+	--panel-border: #e6dfd5;
+	--text-muted: #6b6159;
 	color-scheme: light;
 }
 
 [data-theme='orange-dark'] {
-	--brand-color: #eda47d;
-	--brand-hover: #f5c7ae;
-	--brand-bg: #602012;
-	--bg-page: #1c1410;
-	--text-main: #f5ebe0;
+	--brand-color: #fb923c;
+	--brand-hover: #fdba74;
+	--brand-bg: #431407;
+	--brand-fg: #1c0e06;
+	--bg-page: #14100d;
+	--text-main: #f5ede6;
+	--bg-panel: #1e1814;
+	--bg-elevated: #28201b;
+	--bg-subtle: #2f2620;
+	--panel-border: #3e322a;
+	--text-muted: #ae9d90;
 	color-scheme: dark;
 }
 
 [data-theme='paper-light'] {
-	--brand-color: #161616;
-	--brand-hover: #000000;
-	--brand-bg: #efeee9;
-	--bg-page: #faf9f6;
-	--text-main: #161616;
+	--brand-color: #242820;
+	--brand-hover: #11130f;
+	--brand-bg: #ebe7de;
+	--brand-fg: #faf8f3;
+	--bg-page: #faf8f3;
+	--text-main: #242820;
 	--bg-panel: #ffffff;
-	--panel-border: #d9d6cf;
-	--text-muted: #6b6862;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #ebe7de;
+	--panel-border: #d6d3c7;
+	--text-muted: #555b50;
 	--c-danger: #b3261e;
 	color-scheme: light;
 }
 
 [data-theme='paper-dark'] {
-	--brand-color: #f4f2ec;
+	--brand-color: #f2efe9;
 	--brand-hover: #ffffff;
-	--brand-bg: #3d3c37;
-	--bg-page: #2a2926;
-	--text-main: #f4f2ec;
-	--bg-panel: #33322e;
-	--panel-border: #4a4842;
-	--text-muted: #aaa69c;
+	--brand-bg: #35332d;
+	--brand-fg: #181714;
+	--bg-page: #181714;
+	--text-main: #f2efe9;
+	--bg-panel: #21201c;
+	--bg-elevated: #2a2824;
+	--bg-subtle: #2e2c27;
+	--panel-border: #3e3c36;
+	--text-muted: #a8a49a;
 	--c-danger: #ff8a80;
 	color-scheme: dark;
 }
 
 [data-theme='neutral-light'] {
-	--brand-color: #171717;
-	--brand-hover: #262626;
-	--brand-bg: #f5f5f5;
-	--bg-page: #ffffff;
-	--text-main: #0a0a0a;
-	--bg-panel: #fafafa;
-	--panel-border: #e5e5e5;
-	--text-muted: #737373;
+	--brand-color: #111315;
+	--brand-hover: #26292e;
+	--brand-bg: #eceef0;
+	--brand-fg: #ffffff;
+	--bg-page: #f4f5f6;
+	--text-main: #111315;
+	--bg-panel: #ffffff;
+	--bg-elevated: #ffffff;
+	--bg-subtle: #eceef0;
+	--panel-border: #e4e6ea;
+	--text-muted: #5e646e;
 	color-scheme: light;
 }
 
 [data-theme='neutral-dark'] {
-	--brand-color: #fafafa;
-	--brand-hover: #e5e5e5;
-	--brand-bg: #262626;
-	--bg-page: #0a0a0a;
-	--text-main: #fafafa;
-	--bg-panel: #171717;
-	--panel-border: #262626;
-	--text-muted: #a3a3a3;
+	--brand-color: #f7f8f8;
+	--brand-hover: #e1e4e8;
+	--brand-bg: #22262e;
+	--brand-fg: #0a0b0d;
+	--bg-page: #0a0b0d;
+	--text-main: #f7f8f8;
+	--bg-panel: #131518;
+	--bg-elevated: #1b1e23;
+	--bg-subtle: #1f2228;
+	--panel-border: #272b33;
+	--text-muted: #989fa9;
 	color-scheme: dark;
 }
 
 body {
 	background-color: var(--bg-page);
 	color: var(--text-main);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }

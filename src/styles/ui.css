@@ -1,162 +1,133 @@
 /*
  * UI styles — the structural half of a theme. Pick one with <html data-ui="…"> (ThemeProvider `ui`).
- *   perks  – the original look: big radii, brand-coloured borders, heavy uppercase headings
- *   panel  – flat/dense admin look: small radii, neutral borders, Inter-style headings
- *   soft   – friendly look: pill buttons, hairline borders, calm headings
- *   shadcn – neutral, compact controls (the shadcn/ui look)
- *   silk   – editorial look: square corners, 2px ink borders, serif headings, uppercase labels
+ *   perks  – expressive modern signature: confident radii, clean neutral lines that light up on focus, crisp typography
+ *   panel  – GitHub Primer workbench: 6px controls, 12px popovers, 1px hairline borders, compact density
+ *   soft   – Hey Taby + Freshmart tactile consumer: pill controls, 16-20px surfaces, whisper borders, soft diffuse elevation
+ *   shadcn – FacilityFlow / modern SaaS: alabaster canvas, crisp white 12px cards, 8px controls, calm precision
+ *   silk   – Silkscreen + CrossPoint editorial: 0px square corners, 2px ink borders, serif headings, 4px brutalist hover offset
  */
 :root,
 [data-ui='perks'],
 :root [data-theme] {
-	--ui-radius-control: 0.75rem;
-	--ui-field-px: 1rem;
-	--ui-field-py: 0.625rem;
-	--ui-field-text: 1rem;
-	--ui-btn-px: 1.5rem;
-	--ui-btn-py: 0.75rem;
-	--ui-btn-text: 1rem;
-	--ui-radius-field: 0.75rem;
-	--ui-radius-box: 1rem;
+	--ui-radius-control: 0.625rem;
+	--ui-radius-field: 0.625rem;
+	--ui-radius-box: 0.875rem;
+	--ui-radius-pop: 0.875rem;
 	--ui-radius-item: 0.5rem;
 
-	--ui-border-w: 1px;
-	--ui-line: var(--brand-color);
-	--ui-surface: var(--bg-page);
-	--ui-control-bg: var(--bg-page);
-	--ui-hover: var(--brand-bg);
-	--ui-action-fg: var(--brand-color);
-
-	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-	--ui-shadow-pop: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-
-	--ui-font-heading: inherit;
-	--ui-heading-weight: 900;
-	--ui-heading-case: uppercase;
-	--ui-heading-track: -0.05em;
-	--ui-label-weight: 700;
-	--ui-label-case: uppercase;
-	--ui-label-track: 0.05em;
-}
-
-[data-ui='panel'],
-[data-ui='panel'] [data-theme] {
-	--ui-radius-control: 0.375rem;
+	--ui-h-sm: 2rem;
+	--ui-h-md: 2.5rem;
+	--ui-h-lg: 2.875rem;
 	--ui-field-px: 0.875rem;
 	--ui-field-py: 0.5rem;
-	--ui-field-text: 0.875rem;
-	--ui-btn-px: 1.25rem;
+	--ui-field-text: 0.9375rem;
+	--ui-btn-px: 1.125rem;
 	--ui-btn-py: 0.5rem;
-	--ui-btn-text: 0.875rem;
-	--ui-radius-field: 0.375rem;
-	--ui-radius-box: 0.5rem;
-	--ui-radius-item: 0.375rem;
+	--ui-btn-text: 0.9375rem;
+	--ui-btn-weight: 600;
 
 	--ui-border-w: 1px;
 	--ui-line: var(--panel-border);
+	--ui-line-subtle: color-mix(in srgb, var(--text-main) 9%, transparent);
+	--ui-line-strong: color-mix(in srgb, var(--brand-color) 42%, var(--panel-border));
 	--ui-surface: var(--bg-panel);
+	--ui-elevated: var(--bg-elevated);
+	--ui-subtle: var(--bg-subtle);
 	--ui-control-bg: var(--bg-panel);
-	--ui-hover: color-mix(in srgb, var(--text-main) 6%, transparent);
+	--ui-hover: color-mix(in srgb, var(--text-main) 5.5%, transparent);
 	--ui-action-fg: var(--text-main);
 
-	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.06);
-	--ui-shadow-pop: 0 10px 30px -10px rgb(0 0 0 / 0.3);
+	--ui-shadow-box: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.03);
+	--ui-shadow-pop: 0 0 0 1px rgb(15 23 42 / 0.05), 0 8px 24px -4px rgb(15 23 42 / 0.12), 0 2px 6px -1px rgb(15 23 42 / 0.06);
+	--ui-shadow-hover: 0 4px 12px -2px rgb(15 23 42 / 0.08);
 
 	--ui-font-heading: inherit;
 	--ui-heading-weight: 700;
 	--ui-heading-case: none;
-	--ui-heading-track: -0.01em;
+	--ui-heading-track: -0.025em;
 	--ui-label-weight: 500;
 	--ui-label-case: none;
 	--ui-label-track: 0;
 }
 
-[data-ui='soft'],
-[data-ui='soft'] [data-theme] {
-	--ui-radius-control: 9999px;
-	--ui-field-px: 1rem;
-	--ui-field-py: 0.625rem;
-	--ui-field-text: 1rem;
-	--ui-btn-px: 1.5rem;
-	--ui-btn-py: 0.75rem;
-	--ui-btn-text: 1rem;
-	--ui-radius-field: 0.75rem;
-	--ui-radius-box: 1rem;
-	--ui-radius-item: 0.625rem;
+/* GitHub Primer-inspired workbench */
+[data-ui='panel'],
+[data-ui='panel'] [data-theme] {
+	--ui-radius-control: 0.375rem;
+	--ui-radius-field: 0.375rem;
+	--ui-radius-box: 0.375rem;
+	--ui-radius-pop: 0.75rem;
+	--ui-radius-item: 0.375rem;
+
+	--ui-h-sm: 1.75rem;
+	--ui-h-md: 2rem;
+	--ui-h-lg: 2.5rem;
+	--ui-field-px: 0.75rem;
+	--ui-field-py: 0.375rem;
+	--ui-field-text: 0.875rem;
+	--ui-btn-px: 0.875rem;
+	--ui-btn-py: 0.375rem;
+	--ui-btn-text: 0.875rem;
+	--ui-btn-weight: 500;
 
 	--ui-border-w: 1px;
-	--ui-line: color-mix(in srgb, var(--text-main) 14%, transparent);
+	--ui-line: var(--panel-border);
+	--ui-line-subtle: color-mix(in srgb, var(--text-main) 8%, transparent);
+	--ui-line-strong: color-mix(in srgb, var(--text-main) 24%, transparent);
 	--ui-surface: var(--bg-panel);
+	--ui-elevated: var(--bg-elevated);
+	--ui-subtle: var(--bg-subtle);
 	--ui-control-bg: var(--bg-panel);
-	--ui-hover: var(--brand-bg);
-	--ui-action-fg: var(--brand-color);
+	--ui-hover: color-mix(in srgb, var(--text-main) 5%, transparent);
+	--ui-action-fg: var(--text-main);
 
-	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-	--ui-shadow-pop: 0 12px 32px -8px rgb(0 0 0 / 0.22);
+	--ui-shadow-box: 0 1px 0 rgb(15 23 42 / 0.04);
+	--ui-shadow-pop: 0 0 0 1px rgb(15 23 42 / 0.05), 0 8px 24px rgb(15 23 42 / 0.14), 0 2px 6px rgb(15 23 42 / 0.06);
+	--ui-shadow-hover: 0 1px 3px rgb(15 23 42 / 0.08);
 
 	--ui-font-heading: inherit;
 	--ui-heading-weight: 600;
 	--ui-heading-case: none;
-	--ui-heading-track: -0.01em;
+	--ui-heading-track: -0.015em;
 	--ui-label-weight: 500;
 	--ui-label-case: none;
 	--ui-label-track: 0;
 }
 
-[data-ui='silk'],
-[data-ui='silk'] [data-theme] {
-	--ui-radius-control: 0;
+/* Hey Taby + Freshmart tactile consumer style */
+[data-ui='soft'],
+[data-ui='soft'] [data-theme] {
+	--ui-radius-control: 9999px;
+	--ui-radius-field: 0.875rem;
+	--ui-radius-box: 1.25rem;
+	--ui-radius-pop: 1.25rem;
+	--ui-radius-item: 0.75rem;
+
+	--ui-h-sm: 2rem;
+	--ui-h-md: 2.5rem;
+	--ui-h-lg: 3rem;
 	--ui-field-px: 1rem;
-	--ui-field-py: 0.625rem;
-	--ui-field-text: 1rem;
-	--ui-btn-px: 1.5rem;
-	--ui-btn-py: 0.75rem;
-	--ui-btn-text: 1rem;
-	--ui-radius-field: 0;
-	--ui-radius-box: 0;
-	--ui-radius-item: 0;
-
-	--ui-border-w: 2px;
-	--ui-line: var(--text-main);
-	--ui-surface: var(--bg-panel);
-	--ui-control-bg: var(--bg-panel);
-	--ui-hover: color-mix(in srgb, var(--text-main) 8%, transparent);
-	--ui-action-fg: var(--text-main);
-
-	--ui-shadow-box: none;
-	--ui-shadow-pop: none;
-
-	--ui-font-heading: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
-	--ui-heading-weight: 400;
-	--ui-heading-case: none;
-	--ui-heading-track: -0.02em;
-	--ui-label-weight: 600;
-	--ui-label-case: uppercase;
-	--ui-label-track: 0.12em;
-}
-
-[data-ui='shadcn'],
-[data-ui='shadcn'] [data-theme] {
-	--ui-radius-control: 0.5rem;
-	--ui-radius-field: 0.5rem;
-	--ui-radius-box: 0.75rem;
-	--ui-radius-item: 0.375rem;
-	--ui-field-px: 0.75rem;
-	--ui-field-py: 0.4375rem;
-	--ui-field-text: 0.875rem;
-	--ui-btn-px: 1rem;
-	--ui-btn-py: 0.4375rem;
-	--ui-btn-text: 0.875rem;
+	--ui-field-py: 0.5625rem;
+	--ui-field-text: 0.9375rem;
+	--ui-btn-px: 1.375rem;
+	--ui-btn-py: 0.5625rem;
+	--ui-btn-text: 0.9375rem;
+	--ui-btn-weight: 600;
 
 	--ui-border-w: 1px;
-	--ui-line: var(--panel-border);
-	--ui-surface: var(--bg-page);
-	--ui-control-bg: transparent;
-	--ui-hover: color-mix(in srgb, var(--text-main) 7%, transparent);
+	--ui-line: color-mix(in srgb, var(--text-main) 9%, transparent);
+	--ui-line-subtle: color-mix(in srgb, var(--text-main) 7%, transparent);
+	--ui-line-strong: color-mix(in srgb, var(--text-main) 20%, transparent);
+	--ui-surface: var(--bg-panel);
+	--ui-elevated: var(--bg-elevated);
+	--ui-subtle: var(--bg-subtle);
+	--ui-control-bg: var(--bg-panel);
+	--ui-hover: color-mix(in srgb, var(--text-main) 5%, transparent);
 	--ui-action-fg: var(--text-main);
 
-	--ui-shadow-box: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-	--ui-shadow-pop: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+	--ui-shadow-box: 0 1px 2px rgb(15 23 42 / 0.03), 0 4px 12px -4px rgb(15 23 42 / 0.05);
+	--ui-shadow-pop: 0 0 0 1px rgb(15 23 42 / 0.04), 0 12px 32px -6px rgb(15 23 42 / 0.14), 0 4px 10px -2px rgb(15 23 42 / 0.06);
+	--ui-shadow-hover: 0 8px 20px -6px rgb(15 23 42 / 0.12);
 
 	--ui-font-heading: inherit;
 	--ui-heading-weight: 600;
@@ -165,4 +136,111 @@
 	--ui-label-weight: 500;
 	--ui-label-case: none;
 	--ui-label-track: 0;
+}
+
+/* Silkscreen + CrossPoint editorial hardware sheet */
+[data-ui='silk'],
+[data-ui='silk'] [data-theme] {
+	--ui-radius-control: 0;
+	--ui-radius-field: 0;
+	--ui-radius-box: 0;
+	--ui-radius-pop: 0;
+	--ui-radius-item: 0;
+
+	--ui-h-sm: 2rem;
+	--ui-h-md: 2.5rem;
+	--ui-h-lg: 2.875rem;
+	--ui-field-px: 0.875rem;
+	--ui-field-py: 0.5rem;
+	--ui-field-text: 0.9375rem;
+	--ui-btn-px: 1.25rem;
+	--ui-btn-py: 0.5rem;
+	--ui-btn-text: 0.8125rem;
+	--ui-btn-weight: 600;
+
+	--ui-border-w: 2px;
+	--ui-line: var(--text-main);
+	--ui-line-subtle: color-mix(in srgb, var(--text-main) 26%, transparent);
+	--ui-line-strong: var(--text-main);
+	--ui-surface: var(--bg-panel);
+	--ui-elevated: var(--bg-elevated);
+	--ui-subtle: var(--bg-subtle);
+	--ui-control-bg: var(--bg-panel);
+	--ui-hover: color-mix(in srgb, var(--text-main) 7%, transparent);
+	--ui-action-fg: var(--text-main);
+
+	--ui-shadow-box: none;
+	--ui-shadow-pop: 4px 4px 0 0 var(--text-main);
+	--ui-shadow-hover: 4px 4px 0 0 var(--text-main);
+
+	--ui-font-heading: 'Libre Baskerville', 'Lora', Georgia, 'Times New Roman', serif;
+	--ui-heading-weight: 400;
+	--ui-heading-case: none;
+	--ui-heading-track: -0.025em;
+	--ui-label-weight: 600;
+	--ui-label-case: uppercase;
+	--ui-label-track: 0.1em;
+}
+
+/* FacilityFlow / modern operational SaaS */
+[data-ui='shadcn'],
+[data-ui='shadcn'] [data-theme] {
+	--ui-radius-control: 0.5rem;
+	--ui-radius-field: 0.5rem;
+	--ui-radius-box: 0.875rem;
+	--ui-radius-pop: 0.75rem;
+	--ui-radius-item: 0.375rem;
+
+	--ui-h-sm: 2rem;
+	--ui-h-md: 2.25rem;
+	--ui-h-lg: 2.75rem;
+	--ui-field-px: 0.75rem;
+	--ui-field-py: 0.4375rem;
+	--ui-field-text: 0.875rem;
+	--ui-btn-px: 1rem;
+	--ui-btn-py: 0.4375rem;
+	--ui-btn-text: 0.875rem;
+	--ui-btn-weight: 500;
+
+	--ui-border-w: 1px;
+	--ui-line: var(--panel-border);
+	--ui-line-subtle: color-mix(in srgb, var(--text-main) 8%, transparent);
+	--ui-line-strong: color-mix(in srgb, var(--text-main) 22%, transparent);
+	--ui-surface: var(--bg-panel);
+	--ui-elevated: var(--bg-elevated);
+	--ui-subtle: var(--bg-subtle);
+	--ui-control-bg: var(--bg-panel);
+	--ui-hover: color-mix(in srgb, var(--text-main) 5.5%, transparent);
+	--ui-action-fg: var(--text-main);
+
+	--ui-shadow-box: 0 1px 2px rgb(15 23 42 / 0.03);
+	--ui-shadow-pop: 0 0 0 1px rgb(15 23 42 / 0.06), 0 10px 24px -6px rgb(15 23 42 / 0.12), 0 4px 8px -4px rgb(15 23 42 / 0.06);
+	--ui-shadow-hover: 0 2px 8px -2px rgb(15 23 42 / 0.08);
+
+	--ui-font-heading: inherit;
+	--ui-heading-weight: 600;
+	--ui-heading-case: none;
+	--ui-heading-track: -0.025em;
+	--ui-label-weight: 500;
+	--ui-label-case: none;
+	--ui-label-track: 0;
+}
+
+/* Dark mode elevation: crisp top rim highlight + deep ambient shadow (skipped for silk's brutalist shadow). */
+:where([data-theme='dark'], [data-theme$='-dark']):not([data-ui='silk']),
+[data-ui]:not([data-ui='silk']) :where([data-theme='dark'], [data-theme$='-dark']) {
+	--ui-shadow-box: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.35);
+	--ui-shadow-pop: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 0 0 1px rgb(0 0 0 / 0.45), 0 16px 36px -8px rgb(0 0 0 / 0.65);
+}
+
+/* Silkscreen-style tactile offset hover on buttons & interactive surfaces when data-ui="silk" */
+[data-ui='silk'] button[data-slot='button']:not(:disabled):hover,
+[data-ui='silk'] a[data-slot='button']:hover {
+	box-shadow: var(--ui-shadow-hover);
+	transform: translate(-1px, -1px);
+}
+[data-ui='silk'] button[data-slot='button']:not(:disabled):active,
+[data-ui='silk'] a[data-slot='button']:active {
+	box-shadow: none;
+	transform: translate(1px, 1px);
 }

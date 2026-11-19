@@ -139,7 +139,7 @@ export const DialogOverlay = ({ className, ...props }: React.HTMLAttributes<HTML
 	const ctx = useDialog('DialogOverlay');
 	return (
 		<div
-			className={cn('absolute inset-0 bg-page-text/30 backdrop-blur-sm', ctx.open ? 'animate-pk-fade-in' : 'animate-pk-fade-out', className)}
+			className={cn('absolute inset-0 bg-scrim backdrop-blur-[2px]', ctx.open ? 'animate-pk-fade-in' : 'animate-pk-fade-out', className)}
 			data-state={ctx.open ? 'open' : 'closed'}
 			onClick={() => ctx.setOpen(false)}
 			aria-hidden="true"
@@ -158,6 +158,8 @@ export interface DialogSurfaceProps {
 	closeLabel?: string;
 	closeOnBackdrop?: boolean;
 	role?: 'dialog' | 'alertdialog';
+	/** Exit animation duration in ms (matches CSS exit animation). Default 150. */
+	exitMs?: number;
 	/** Extra attributes for the panel element (data-*, aria-*, id, style…). */
 	panelProps?: Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'children'>;
 }
@@ -174,21 +176,21 @@ const EXIT_CLASSES: [string, string][] = [
 export const toExitClass = (className: string) => EXIT_CLASSES.reduce((acc, [enter, exit]) => acc.replace(enter, exit), className);
 
 /** Internal primitive (Dialog/Sheet/Alert content). Prefer DialogContent / SheetContent. */
-export const DialogSurfacePrimitive = ({ part, children, wrapperClassName, panelClassName, showCloseButton, closeLabel = 'Close', closeOnBackdrop = true, role = 'dialog', panelProps }: DialogSurfaceProps) => {
+export const DialogSurfacePrimitive = ({ part, children, wrapperClassName, panelClassName, showCloseButton, closeLabel = 'Close', closeOnBackdrop = true, role = 'dialog', exitMs = 150, panelProps }: DialogSurfaceProps) => {
 	const ctx = useDialog(part);
 	const panelRef = useRef<HTMLDivElement>(null);
-	const isTop = useLayer(ctx.open);
+	const { isTop, zIndex } = useLayer(ctx.open, 'overlay');
 	useScrollLock(ctx.open);
 	useEscape(() => isTop() && ctx.setOpen(false), ctx.open);
 	useFocusTrap(panelRef, ctx.open);
 
-	const { mounted, state } = usePresence(ctx.open);
+	const { mounted, state } = usePresence(ctx.open, exitMs);
 	if (!mounted) return null;
 	const closed = state === 'closed';
 	return (
 		<Portal>
-			<div className={cn(wrapperClassName, closed && 'pointer-events-none')} {...presenceAttrs(state)}>
-				<div className={cn('absolute inset-0 bg-page-text/30 backdrop-blur-sm', closed ? 'animate-pk-fade-out' : 'animate-pk-fade-in')} onClick={closeOnBackdrop ? () => ctx.setOpen(false) : undefined} aria-hidden="true" data-pk-overlay="" />
+			<div data-pk-layer="" style={{ zIndex }} className={cn(wrapperClassName, closed && 'pointer-events-none')} {...presenceAttrs(state)}>
+				<div className={cn('absolute inset-0 bg-scrim backdrop-blur-[2px]', closed ? 'animate-pk-fade-out' : 'animate-pk-fade-in')} onClick={closeOnBackdrop ? () => ctx.setOpen(false) : undefined} aria-hidden="true" data-pk-overlay="" />
 				<div
 					ref={panelRef}
 					role={role}
@@ -205,9 +207,9 @@ export const DialogSurfacePrimitive = ({ part, children, wrapperClassName, panel
 							type="button"
 							onClick={() => ctx.setOpen(false)}
 							aria-label={closeLabel}
-							className="absolute end-4 top-4 z-10 rounded-item p-1 text-muted hover:text-page-text hover:bg-hover transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
+							className="absolute end-4 top-4 z-10 rounded-item p-1.5 text-muted hover:text-page-text hover:bg-hover transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
 						>
-							<CloseIcon className="size-5" />
+							<CloseIcon className="size-4" />
 						</button>
 					)}
 					{children}
@@ -231,9 +233,9 @@ export interface DialogContentProps extends Omit<React.HTMLAttributes<HTMLDivEle
 export const DialogContent = ({ children, className, showCloseButton = true, closeOnBackdrop = true, closeLabel, role, ...panelProps }: DialogContentProps) => (
 	<DialogSurfacePrimitive
 		part="DialogContent"
-		wrapperClassName="fixed inset-0 z-[100] flex items-center justify-center"
+		wrapperClassName="fixed inset-0 flex items-center justify-center p-4"
 		panelClassName={cn(
-			'relative flex w-full max-w-[calc(100%-2rem)] sm:max-w-lg max-h-[calc(100dvh-2rem)] flex-col gap-4 overflow-y-auto p-6 rounded-box ui-border border-line bg-surface text-page-text shadow-pop outline-none',
+			'relative flex w-full max-w-[calc(100%-2rem)] sm:max-w-lg max-h-[calc(100dvh-2rem)] flex-col gap-4 overflow-y-auto p-6 rounded-pop ui-border border-line bg-elevated text-page-text shadow-pop outline-none',
 			'animate-pk-slide-up',
 			className,
 		)}
@@ -247,11 +249,11 @@ export const DialogContent = ({ children, className, showCloseButton = true, clo
 	</DialogSurfacePrimitive>
 );
 
-export const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div data-slot="dialog-header" className={cn('flex flex-col gap-2 text-center sm:text-start', className)} {...props} />;
+export const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div data-slot="dialog-header" className={cn('flex flex-col gap-1.5 text-center sm:text-start', className)} {...props} />;
 export const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div data-slot="dialog-footer" className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)} {...props} />;
 
 /** Scrollable middle section for the sticky header/footer pattern: `<DialogContent><DialogHeader/><DialogBody>…</DialogBody><DialogFooter/></DialogContent>`. */
-export const DialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div data-slot="dialog-body" className={cn('min-h-0 flex-1 overflow-y-auto', className)} {...props} />;
+export const DialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div data-slot="dialog-body" className={cn('min-h-0 flex-1 overflow-y-auto pk-scrollbar', className)} {...props} />;
 
 export const DialogTitle = ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
 	const ctx = useDialog('DialogTitle');
@@ -260,5 +262,5 @@ export const DialogTitle = ({ className, ...props }: React.HTMLAttributes<HTMLHe
 
 export const DialogDescription = ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => {
 	const ctx = useDialog('DialogDescription');
-	return <p id={ctx.descriptionId} className={cn('text-sm text-page-text/70 leading-relaxed', className)} {...props} />;
+	return <p id={ctx.descriptionId} className={cn('text-sm text-secondary leading-relaxed', className)} {...props} />;
 };

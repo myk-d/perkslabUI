@@ -54,8 +54,8 @@ export const Command = ({ groups, placeholder = 'Type a command or search…', e
 	};
 
 	return (
-		<div className={cn('flex w-full flex-col overflow-hidden rounded-box bg-surface text-page-text', className)}>
-			<div className="flex items-center gap-2 border-b border-line/40 px-3">
+		<div className={cn('flex w-full flex-col overflow-hidden rounded-pop bg-elevated text-page-text', className)}>
+			<div className="flex items-center gap-2 border-b border-line-subtle px-3.5">
 				<SearchIcon className="size-4 shrink-0 text-muted" />
 				<input
 					ref={inputRef}
@@ -86,11 +86,11 @@ export const Command = ({ groups, placeholder = 'Type a command or search…', e
 					className="h-12 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
 				/>
 			</div>
-			<div id={`${uid}-list`} role="listbox" className="max-h-80 overflow-y-auto p-1 pk-scrollbar">
+			<div id={`${uid}-list`} role="listbox" className="max-h-80 overflow-y-auto p-1.5 pk-scrollbar">
 				{visible.length === 0 && <div className="py-8 text-center text-sm text-muted">{emptyText}</div>}
 				{visible.map((g, gi) => (
-					<div key={g.heading ?? gi} role="group" aria-label={g.heading} className={cn(gi > 0 && 'mt-1 border-t border-line/30 pt-1')}>
-						{g.heading && <div className="ui-label px-3 py-1.5 text-[11px] text-muted">{g.heading}</div>}
+					<div key={g.heading ?? gi} role="group" aria-label={g.heading} className={cn(gi > 0 && 'mt-1.5 border-t border-line-subtle pt-1.5')}>
+						{g.heading && <div className="ui-label px-2.5 py-1.5 text-[11px] text-muted">{g.heading}</div>}
 						{g.items.map((item) => {
 							const isActive = flat[idx]?.value === item.value;
 							return (
@@ -102,7 +102,7 @@ export const Command = ({ groups, placeholder = 'Type a command or search…', e
 									aria-disabled={item.disabled}
 									onMouseEnter={() => !item.disabled && setActive(flat.findIndex((f) => f.value === item.value))}
 									onClick={() => run(item)}
-									className={cn('flex cursor-pointer items-center gap-2 rounded-item px-3 py-2 text-sm', isActive && 'bg-hover', item.disabled && 'cursor-not-allowed opacity-40')}
+									className={cn('flex cursor-pointer items-center gap-2 rounded-item px-2.5 py-2 text-sm transition-colors duration-150', isActive && 'bg-hover', item.disabled && 'cursor-not-allowed opacity-40')}
 								>
 									{item.icon && <span className="flex size-4 shrink-0 items-center justify-center text-muted [&>svg]:size-4">{item.icon}</span>}
 									<span className="flex-1 truncate">{item.label}</span>

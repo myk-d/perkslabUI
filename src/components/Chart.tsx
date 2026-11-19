@@ -1,6 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Portal } from '../lib/Portal';
 import { cn } from '../lib/cn';
 import { isBrowser } from '../lib/dom';
+import { useLayer } from '../lib/layers';
 
 /* ------------------------------------------------------------------ types + helpers */
 
@@ -66,8 +68,10 @@ function useSeries(series: ChartSeries[], config: ChartConfig) {
 interface ChartContextValue {
 	config: ChartConfig;
 	width: number;
+	containerRef: React.RefObject<HTMLDivElement | null>;
 }
-const ChartContext = createContext<ChartContextValue>({ config: {}, width: 0 });
+const emptyChartRef: React.RefObject<HTMLDivElement | null> = { current: null };
+const ChartContext = createContext<ChartContextValue>({ config: {}, width: 0, containerRef: emptyChartRef });
 export const useChart = () => useContext(ChartContext);
 
 export interface ChartContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -93,7 +97,7 @@ export const ChartContainer = ({ config = {}, height = 260, className, children,
 		return () => ro.disconnect();
 	}, []);
 
-	const value = useMemo(() => ({ config, width }), [config, width]);
+	const value = useMemo(() => ({ config, width, containerRef: ref }), [config, width]);
 	return (
 		<ChartContext.Provider value={value}>
 			<div ref={ref} className={cn('relative w-full text-page-text', className)} style={{ height: height === 'auto' ? undefined : height, ...style }} {...props}>
@@ -147,16 +151,35 @@ export interface ChartTooltipProps {
 	className?: string;
 }
 
-/** Themed tooltip card. Render it inside a `ChartContainer`; it flips to the left of the anchor on the right half. */
+/** Themed tooltip card. Portals to viewport when mounted inside a `ChartContainer` so it is never clipped by overflow-hidden cards or hidden behind sidebars. */
 export const ChartTooltip = ({ open, x, y, title, items, className }: ChartTooltipProps) => {
-	const { width } = useChart();
+	const { width, containerRef } = useChart();
+	const { zIndex } = useLayer(open, 'tooltip');
 	if (!open) return null;
+
+	const rect = containerRef.current?.getBoundingClientRect();
 	const flip = width > 0 && x > width / 2;
-	return (
+	const margin = 8;
+
+	const card = (
 		<div
 			role="status"
-			style={{ left: x, top: Math.max(0, y), transform: `translate(${flip ? 'calc(-100% - 12px)' : '12px'}, -50%)` }}
-			className={cn('pointer-events-none absolute z-10 min-w-28 max-w-60 rounded-item ui-border bg-surface px-3 py-2 text-xs text-page-text shadow-pop', className)}
+			style={
+				rect
+					? {
+							position: 'fixed',
+							zIndex,
+							left: Math.min(Math.max(rect.left + x, margin), window.innerWidth - margin),
+							top: Math.min(Math.max(rect.top + y, margin + 24), window.innerHeight - margin - 24),
+							transform: `translate(${flip ? 'calc(-100% - 12px)' : '12px'}, -50%)`,
+						}
+					: { left: x, top: Math.max(0, y), transform: `translate(${flip ? 'calc(-100% - 12px)' : '12px'}, -50%)` }
+			}
+			className={cn(
+				'pointer-events-none min-w-28 max-w-60 rounded-item ui-border border-line bg-elevated px-3 py-2 text-xs text-page-text shadow-pop animate-pk-fade-in',
+				!rect && 'absolute z-10',
+				className,
+			)}
 		>
 			{title != null && <div className="ui-label mb-1 text-[11px] text-muted">{title}</div>}
 			<ul className="flex flex-col gap-1">
@@ -170,6 +193,8 @@ export const ChartTooltip = ({ open, x, y, title, items, className }: ChartToolt
 			</ul>
 		</div>
 	);
+
+	return rect ? <Portal anchorRef={containerRef}>{card}</Portal> : card;
 };
 
 /* ------------------------------------------------------------------ shared internals */
